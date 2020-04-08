@@ -106,7 +106,7 @@
             <groupId>org.nocturne</groupId>
             <artifactId>vslab-backserver-api</artifactId>
             <version>1</version>
-            <systemPath>${basedir}/lib/vslab-backserver-api-1.0-SNAPSHOT-jar-with-dependencies.jar</systemPath>
+            <systemPath>${basedir}/lib/common-api-1.0-SNAPSHOT-jar-with-dependencies.jar</systemPath>
             <scope>system</scope>
         </dependency>
 
