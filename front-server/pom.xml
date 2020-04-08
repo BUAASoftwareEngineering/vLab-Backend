@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.nocturne</groupId>
-    <artifactId>vslab-frontserver</artifactId>
+    <artifactId>front-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>vslab-frontserver</name>
+    <name>front-server</name>
     <description>FrontServer for VSLAB</description>
 
     <properties>
