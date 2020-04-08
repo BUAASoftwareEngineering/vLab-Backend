@@ -27,7 +27,7 @@ public class UserController {
             String encryptedPassword = DigestUtils.md5DigestAsHex(password.getBytes());
 
             if (encryptedPassword.equals(user.getPassword())) {
-                return new Result(true, "登录成功", JSON.toJSON(user));
+                return new Result(true, "登录成功", user);
             }
         } catch (Exception ignored) {
 
@@ -62,7 +62,7 @@ public class UserController {
         User user = new User(userId, username, DigestUtils.md5DigestAsHex(password.getBytes()));
         userMapper.updateUser(user);
 
-        return new Result(true, "修改成功", JSON.toJSON(user));
+        return new Result(true, "修改成功", user);
     }
 
     @GetMapping("/info")
@@ -72,7 +72,7 @@ public class UserController {
         }
 
         User user = userMapper.getUserByName(username);
-        return new Result(true, "查询成功", JSON.toJSON(user));
+        return new Result(true, "查询成功", user);
     }
 
     private boolean isUserExists(String username) {

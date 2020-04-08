@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest
 class ContainerMapperTest {
 
-
     @Autowired
     public ContainerMapper containerMapper;
 

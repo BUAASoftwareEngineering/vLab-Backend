@@ -13,7 +13,7 @@ public class Container {
     /**
      * 数据库中的id字段，唯一标识container
      */
-    private Integer id;
+    private Integer projectId;
 
     /**
      * docker内的containerId属性，不同的docker下可能重复

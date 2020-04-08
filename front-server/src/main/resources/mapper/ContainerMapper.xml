@@ -4,7 +4,7 @@
 <mapper namespace="org.nocturne.vslab.frontserver.mapper.ContainerMapper">
 
     <resultMap id="baseResultMap" type="org.nocturne.vslab.api.entity.Container">
-        <id column="id" property="id"/>
+        <id column="id" property="projectId"/>
         <result column="type" property="imageType"/>
         <result column="container_id" property="containerId"/>
         <result column="container_name" property="name"/>
