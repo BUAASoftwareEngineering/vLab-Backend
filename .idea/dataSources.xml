@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="BuaaHost" uuid="1a4e82a1-ded5-4df3-b9d7-e85206e22344">
+      <driver-ref>mysql.8</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
+      <jdbc-url>jdbc:mysql://114.116.135.181:3306/vslab?characterEncoding=UTF-8</jdbc-url>
+    </data-source>
+  </component>
+</project>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="org.nocturne.vslab.frontserver.mapper.ContainerMapper">
+
+    <resultMap id="baseResultMap" type="org.nocturne.vslab.api.entity.Container">
+        <id column="id" property="id"/>
+        <result column="type" property="imageType"/>
+        <result column="container_id" property="containerId"/>
+        <result column="container_name" property="name"/>
+        <result column="ip" property="ip"/>
+        <result column="terminal_port" property="terminalPort"/>
+        <result column="server_port" property="serverPort"/>
+    </resultMap>
+
+    <!--public List<Container> getContainersOfUser(Integer userId);-->
+    <select id="getContainersOfUser" resultMap="baseResultMap">
+        SELECT tb_container.*
+        FROM tb_user_container, tb_container
+        WHERE user_id = #{userId} AND tb_container.id = tb_user_container.container_id;
+    </select>
+
+    <!--public Container getContainerById(Integer id);-->
+    <select id="getContainerById" resultMap="baseResultMap">
+        SELECT * FROM tb_container
+        WHERE tb_container.id = #{id}
+    </select>
+
+</mapper>
