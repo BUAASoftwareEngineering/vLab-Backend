@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -23,17 +25,17 @@ class DockerManagerImplTest {
     }
 
     @Test
-    void destroyContainerTest() {
-        dockerManager.destroyContainer(2);
-    }
-
-    @Test
     void startContainerTest() {
-        dockerManager.startContainer(1);
+        dockerManager.startContainer(8);
     }
 
     @Test
     void stopContainerTest() {
-        dockerManager.stopContainer(1);
+        dockerManager.stopContainer(8);
+    }
+
+    @Test
+    void destroyContainerTest() {
+        dockerManager.destroyContainer(8);
     }
 }

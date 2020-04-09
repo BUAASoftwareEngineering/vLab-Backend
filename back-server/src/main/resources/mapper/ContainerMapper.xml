@@ -31,4 +31,9 @@
         DELETE FROM tb_container WHERE project_id = #{projectId}
     </delete>
 
+    <!--    public void updateContainer(Container container);-->
+    <update id="updateContainer">
+        UPDATE tb_container SET server_port = #{serverPort}, terminal_port = #{terminalPort} WHERE project_id = #{projectId};
+    </update>
+
 </mapper>

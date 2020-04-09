@@ -24,7 +24,7 @@ public class DockerClientFactory {
     }
 
     public static synchronized DockerClient getDockerClient(String ip) {
-        DefaultDockerClientConfig config = configBuilder.withDockerHost("tcp://127.0.0.1:2375").build();
+        DefaultDockerClientConfig config = configBuilder.withDockerHost(String.format("tcp://%s:2375", ip)).build();
         return DockerClientBuilder.getInstance(config).build();
     }
 }

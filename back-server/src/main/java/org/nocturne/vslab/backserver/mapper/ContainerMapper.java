@@ -11,4 +11,6 @@ public interface ContainerMapper {
     public void createContainer(Container container);
 
     public void deleteContainer(Integer projectId);
+
+    public void updateContainer(Container container);
 }
