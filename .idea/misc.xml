@@ -11,6 +11,7 @@
         <option value="$PROJECT_DIR$/vslab-frontserver/pom.xml" />
         <option value="$PROJECT_DIR$/common-api/pom.xml" />
         <option value="$PROJECT_DIR$/front-server/pom.xml" />
+        <option value="$PROJECT_DIR$/back-server/pom.xml" />
       </list>
     </option>
   </component>

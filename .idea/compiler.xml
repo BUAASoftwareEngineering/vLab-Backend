@@ -7,10 +7,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="common-api" />
+        <module name="back-server" />
         <module name="front-server" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="back-server" target="1.8" />
       <module name="common-api" target="1.5" />
       <module name="front-server" target="1.8" />
       <module name="vLab-Backend" target="1.5" />
@@ -18,6 +20,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="back-server" options="-parameters" />
       <module name="front-server" options="-parameters" />
     </option>
   </component>

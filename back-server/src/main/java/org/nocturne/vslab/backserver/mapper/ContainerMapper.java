@@ -1,14 +1,14 @@
-package org.nocturne.vslab.frontserver.mapper;
+package org.nocturne.vslab.backserver.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.nocturne.vslab.api.entity.Container;
 
-import java.util.List;
-
 @Mapper
 public interface ContainerMapper {
 
-    public List<Container> getContainersOfUser(Integer userId);
-
     public Container getContainerById(Integer projectId);
+
+    public void createContainer(Container container);
+
+    public void deleteContainer(Integer projectId);
 }

@@ -8,8 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Container {
-    private ImageType imageType;
-
     /**
      * 数据库中的id字段，唯一标识container
      */
@@ -19,6 +17,10 @@ public class Container {
      * docker内的containerId属性，不同的docker下可能重复
      */
     private String containerId;
+
+    private Integer userId;
+
+    private ImageType imageType;
 
     private String name;
 
