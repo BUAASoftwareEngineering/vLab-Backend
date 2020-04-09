@@ -1,6 +1,5 @@
 package org.nocturne.vslab.frontserver.controller;
 
-import com.alibaba.fastjson.JSON;
 import org.nocturne.vslab.api.entity.User;
 import org.nocturne.vslab.frontserver.bean.Result;
 import org.nocturne.vslab.frontserver.mapper.UserMapper;
@@ -8,6 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+
+@CrossOrigin(origins = "*", allowedHeaders = "*", allowCredentials = "true")
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -19,14 +22,17 @@ public class UserController {
         this.userMapper = userMapper;
     }
 
-    @PostMapping("/auth")
-    public Result auth(@RequestParam("user_name") String username,
-                         @RequestParam("password") String password) {
+    @PostMapping("/login")
+    public Result login(HttpServletResponse response,
+                       @RequestParam("user_name") String username,
+                       @RequestParam("password") String password) {
         try {
             User user = userMapper.getUserByName(username);
             String encryptedPassword = DigestUtils.md5DigestAsHex(password.getBytes());
 
             if (encryptedPassword.equals(user.getPassword())) {
+                response.addCookie(new Cookie("user_id", user.getId().toString()));
+                response.addCookie(new Cookie("user_name", user.getName()));
                 return new Result(true, "登录成功", user);
             }
         } catch (Exception ignored) {
@@ -34,6 +40,14 @@ public class UserController {
         }
 
         return new Result(false, "用户名或密码错误", null);
+    }
+
+    @PostMapping("/logout")
+    public Result logout(HttpServletResponse response) {
+        removeCookie(response, "user_id");
+        removeCookie(response, "user_name");
+
+        return new Result(true, "登出成功", null);
     }
 
     @PostMapping("/register")
@@ -49,7 +63,8 @@ public class UserController {
     }
 
     @PostMapping("/info_update")
-    public Result infoUpdate(@RequestParam("user_id") Integer userId,
+    public Result infoUpdate(HttpServletResponse response,
+                             @RequestParam("user_id") Integer userId,
                              @RequestParam("user_name") String username,
                              @RequestParam("password") String password) {
         if (!isUserExists(userId)) {
@@ -62,16 +77,17 @@ public class UserController {
         User user = new User(userId, username, DigestUtils.md5DigestAsHex(password.getBytes()));
         userMapper.updateUser(user);
 
+        response.addCookie(new Cookie("user_name", user.getName()));
         return new Result(true, "修改成功", user);
     }
 
     @GetMapping("/info")
-    public Result info(@RequestParam("user_name") String username) {
-        if (!isUserExists(username)) {
+    public Result info(@RequestParam("user_id") Integer userId) {
+        if (!isUserExists(userId)) {
             return new Result(false, "用户不存在", null);
         }
 
-        User user = userMapper.getUserByName(username);
+        User user = userMapper.getUserById(userId);
         return new Result(true, "查询成功", user);
     }
 
@@ -91,5 +107,11 @@ public class UserController {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private void removeCookie(HttpServletResponse response, String cookieName) {
+        Cookie cookie = new Cookie(cookieName, "");
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
     }
 }
