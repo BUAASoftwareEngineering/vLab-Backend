@@ -9,6 +9,8 @@ import org.nocturne.vslab.frontserver.mapper.ContainerMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import static org.nocturne.vslab.frontserver.config.StringConst.*;
+
 import java.util.List;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*", allowCredentials = "true")
@@ -27,13 +29,13 @@ public class ProjectController {
     }
 
     @GetMapping("/info")
-    public Result getAllProjectInfo(@RequestParam("user_id") Integer userId) {
+    public Result getAllProjectInfo(@CookieValue(PARAM_USER_ID) Integer userId) {
         List<Container> containerList = containerMapper.getContainersOfUser(userId);
         return new Result(0, "查询成功", containerList);
     }
 
     @PostMapping("/new")
-    public Result createProject(@RequestParam("user_id") Integer userId,
+    public Result createProject(@CookieValue(PARAM_USER_ID) Integer userId,
                                 @RequestParam("project_name") String projectName,
                                 @RequestParam("project_type") String projectType) {
         ImageType imageType = ImageType.valueOf(projectType);
