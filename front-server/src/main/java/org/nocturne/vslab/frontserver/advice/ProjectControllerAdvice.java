@@ -13,13 +13,13 @@ public class ProjectControllerAdvice {
     @ExceptionHandler(value = ProjectNotFoundException.class)
     @ResponseBody
     public Result projectNotFoundHandler(ProjectNotFoundException e) {
-        return new Result(-1, "项目不存在", null);
+        return new Result(ProjectNotFoundException.CODE, "项目不存在", null);
     }
 
 
     @ExceptionHandler(value = UnknownProjectTypeException.class)
     @ResponseBody
     public Result unknownProjectTypeHandler(UnknownProjectTypeException e) {
-        return new Result(-1, "项目类型不存在", null);
+        return new Result(UnknownProjectTypeException.CODE, "项目类型不存在", null);
     }
 }

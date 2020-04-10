@@ -15,20 +15,20 @@ public class UserControllerAdvice {
 
     @ExceptionHandler(value = UserNotFoundException.class)
     @ResponseBody
-    public Result userNotFoundHandler(UnknownProjectTypeException e) {
-        return new Result(-1, "用户不存在", null);
+    public Result userNotFoundHandler(UserNotFoundException e) {
+        return new Result(UserNotFoundException.CODE, "用户不存在", null);
     }
 
     @ExceptionHandler(value = UsernameAlreadyExist.class)
     @ResponseBody
     public Result usernameAlreadyExistHandler(UsernameAlreadyExist e) {
-        return new Result(-1, "用户名已存在", null);
+        return new Result(UsernameAlreadyExist.CODE, "用户名已存在", null);
     }
 
     @ExceptionHandler(value = UserAuthFailException.class)
     @ResponseBody
     public Result userAuthFailHandler(UserAuthFailException e) {
-        return new Result(-1, "用户未登录", null);
+        return new Result(UserAuthFailException.CODE, "用户未登录", null);
     }
 
 }
