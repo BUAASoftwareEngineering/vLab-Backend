@@ -56,7 +56,8 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public Result register(@RequestParam("user_name") String username, @RequestParam("password") String password) {
+    public Result register(@RequestParam("user_name") String username,
+                           @RequestParam("password") String password) {
         if (isUserExists(username)) {
             throw new UsernameAlreadyExist();
         }
@@ -69,7 +70,7 @@ public class UserController {
 
     @PostMapping("/info_update")
     public Result infoUpdate(HttpServletResponse response,
-                             @RequestParam("user_id") Integer userId,
+                             @CookieValue("user_id") Integer userId,
                              @RequestParam("user_name") String username,
                              @RequestParam("password") String password) {
         if (!isUserExists(userId)) {
@@ -87,7 +88,7 @@ public class UserController {
     }
 
     @GetMapping("/info")
-    public Result info(@RequestParam("user_id") Integer userId) {
+    public Result info(@CookieValue("user_id") Integer userId) {
         if (!isUserExists(userId)) {
             throw new UserNotFoundException();
         }
