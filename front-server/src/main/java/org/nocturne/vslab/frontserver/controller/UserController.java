@@ -33,6 +33,7 @@ public class UserController {
     public Result login(HttpServletResponse response,
                        @RequestParam("user_name") String username,
                        @RequestParam("password") String password) {
+        try {
             User user = userMapper.getUserByName(username);
             String encryptedPassword = DigestUtils.md5DigestAsHex(password.getBytes());
 
@@ -44,6 +45,9 @@ public class UserController {
             } else {
                 throw new UserAuthFailException();
             }
+        } catch (Exception e) {
+            throw new UserAuthFailException();
+        }
     }
 
     @PostMapping("/logout")
