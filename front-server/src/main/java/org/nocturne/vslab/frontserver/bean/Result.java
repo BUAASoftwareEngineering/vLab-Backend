@@ -13,12 +13,12 @@ public class Result {
     private String message;
     private Object data;
 
-    public Boolean getSuccess() {
-        return success;
+    public Integer getCode() {
+        return code;
     }
 
-    public void setSuccess(Boolean success) {
-        this.success = success;
+    public void setCode(Integer code) {
+        this.code = code;
     }
 
     public String getMessage() {
