@@ -6,6 +6,7 @@ import org.nocturne.vslab.frontserver.exceptiion.user.UserAuthFailException;
 import org.nocturne.vslab.frontserver.exceptiion.user.UserNotFoundException;
 import org.nocturne.vslab.frontserver.exceptiion.user.UsernameAlreadyExist;
 import org.nocturne.vslab.frontserver.mapper.UserMapper;
+import org.nocturne.vslab.frontserver.util.UserTokenPool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +20,13 @@ import javax.servlet.http.HttpServletResponse;
 public class UserController {
 
     private UserMapper userMapper;
+    private UserTokenPool userTokenPool;
 
     @Autowired
-    public UserController(UserMapper userMapper) {
+    public UserController(UserMapper userMapper,
+                          UserTokenPool userTokenPool) {
         this.userMapper = userMapper;
+        this.userTokenPool = userTokenPool;
     }
 
     @PostMapping("/login")
@@ -35,6 +39,7 @@ public class UserController {
             if (encryptedPassword.equals(user.getPassword())) {
                 response.addCookie(new Cookie("user_id", user.getId().toString()));
                 response.addCookie(new Cookie("user_name", user.getName()));
+                response.addCookie(new Cookie("user_token", userTokenPool.generateToken(user.getId())));
                 return new Result(0, "登录成功", user);
             } else {
                 throw new UserAuthFailException();
@@ -45,6 +50,7 @@ public class UserController {
     public Result logout(HttpServletResponse response) {
         removeCookie(response, "user_id");
         removeCookie(response, "user_name");
+        removeCookie(response, "user_token");
 
         return new Result(0, "登出成功", null);
     }
