@@ -9,7 +9,7 @@ public class DockerHostConfig {
 
     static {
         dockerHostIPList = new ArrayList<>();
-        dockerHostIPList.add("127.0.0.1");
+        dockerHostIPList.add("120.53.37.31");
     }
 
     public static String getIPRandomly() {
