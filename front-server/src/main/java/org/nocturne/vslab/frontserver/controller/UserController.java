@@ -18,8 +18,8 @@ import static org.nocturne.vslab.frontserver.config.StringConst.*;
 @RequestMapping("/user")
 public class UserController {
 
-    private UserService userService;
-    private UserTokenPool userTokenPool;
+    private final UserService userService;
+    private final UserTokenPool userTokenPool;
 
     @Autowired
     public UserController(UserService userService,
@@ -68,7 +68,7 @@ public class UserController {
         User user = new User(userId, username, DigestUtils.md5DigestAsHex(password.getBytes()));
         userService.updateUser(user);
 
-        response.addCookie(new Cookie(COOKIE_USER_NAME, user.getName()));
+        setCookie(response, COOKIE_USER_NAME, user.getName());
         return new Result(0, "修改成功", user);
     }
 
@@ -79,7 +79,12 @@ public class UserController {
     }
 
     private void removeCookie(HttpServletResponse response, String cookieName) {
+        removeCookie(response, cookieName, "/");
+    }
+
+    private void removeCookie(HttpServletResponse response, String cookieName, String path) {
         Cookie cookie = new Cookie(cookieName, null);
+        cookie.setPath(path);
         cookie.setMaxAge(0);
         response.addCookie(cookie);
     }

@@ -16,7 +16,6 @@
       <module name="back-server" target="1.8" />
       <module name="common-api" target="1.5" />
       <module name="front-server" target="1.8" />
-      <module name="vLab-Backend" target="1.5" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
