@@ -3,12 +3,13 @@ package org.nocturne.vslab.api.entity;
 import lombok.Builder;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Data
 @Builder
 public class File {
-    public enum FileType {
+    public enum FileType implements Serializable {
         FILE,
         DIR
     }

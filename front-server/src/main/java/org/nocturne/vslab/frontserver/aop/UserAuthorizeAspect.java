@@ -6,6 +6,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.nocturne.vslab.frontserver.exceptiion.user.UserAuthFailException;
 import org.nocturne.vslab.frontserver.util.UserTokenPool;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.Objects;
 
 @Aspect
+@Order(1)
 @Component
 public class UserAuthorizeAspect {
 
@@ -33,14 +35,18 @@ public class UserAuthorizeAspect {
 
     @Before("authPointcut()")
     public void authorizeLoginState() {
-        ServletRequestAttributes attributes = (ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes());
-        HttpServletRequest request = attributes.getRequest();
+        try {
+            ServletRequestAttributes attributes = (ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes());
+            HttpServletRequest request = attributes.getRequest();
 
-        Cookie[] cookies = request.getCookies();
-        Integer userId = Integer.parseInt(getCookieValue(cookies, "user_id"));
-        String userToken = getCookieValue(cookies, "user_token");
+            Cookie[] cookies = request.getCookies();
+            Integer userId = Integer.parseInt(getCookieValue(cookies, "user_id"));
+            String userToken = getCookieValue(cookies, "user_token");
 
-        if (!userTokenPool.isUserTokenAccepted(userId, userToken)) {
+            if (!userTokenPool.isUserTokenAccepted(userId, userToken)) {
+                throw new UserAuthFailException();
+            }
+        } catch (Exception e) {
             throw new UserAuthFailException();
         }
     }
@@ -52,6 +58,6 @@ public class UserAuthorizeAspect {
             }
         }
 
-        return "";
+        return null;
     }
 }

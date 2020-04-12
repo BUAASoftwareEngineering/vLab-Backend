@@ -4,10 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Container {
+public class Container implements Serializable {
     /**
      * 数据库中的id字段，唯一标识container
      */
@@ -28,4 +30,8 @@ public class Container {
 
     private Integer serverPort;
     private Integer terminalPort;
+
+    public static String getActualContainerName(String name, Integer projectId) {
+        return String.format("%s_%d", name, projectId);
+    }
 }

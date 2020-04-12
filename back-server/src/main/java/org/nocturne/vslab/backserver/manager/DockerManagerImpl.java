@@ -54,7 +54,6 @@ public class DockerManagerImpl implements DockerManager {
                 .withExposedPorts(exposedPortList)
                 .withEnv("MYSQL_ROOT_PASSWORD=123")
                 .withHostConfig(HostConfig.newHostConfig().withPortBindings(portBindings).withPublishAllPorts(false))
-                .withName(containerName)
                 .exec();
         String containerId = response.getId().substring(0, 12);
 
@@ -62,7 +61,8 @@ public class DockerManagerImpl implements DockerManager {
                 null,
                 containerId,
                 userId,
-                imageType, containerName,
+                imageType,
+                containerName,
                 ip,
                 0,
                 0);

@@ -26,16 +26,16 @@ class DockerManagerImplTest {
 
     @Test
     void startContainerTest() {
-        dockerManager.startContainer(8);
+        dockerManager.startContainer(10);
     }
 
     @Test
     void stopContainerTest() {
-        dockerManager.stopContainer(8);
+        dockerManager.stopContainer(10);
     }
 
     @Test
     void destroyContainerTest() {
-        dockerManager.destroyContainer(8);
+        dockerManager.destroyContainer(10);
     }
 }
