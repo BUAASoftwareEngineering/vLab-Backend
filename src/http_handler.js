@@ -1,5 +1,10 @@
 const fs = require('fs')
 
+function solve_data(data) {
+    let obj = ''
+    let params = data.split('&')
+}
+
 function file_file_struct(data) {
 
 }
