@@ -13,10 +13,10 @@ public class DockerClientFactory {
 
     static {
         configBuilder = DefaultDockerClientConfig.createDefaultConfigBuilder()
-                //.withDockerTlsVerify(true)
-                //.withDockerCertPath("/home/user/.docker/certs")
+                .withDockerTlsVerify(true)
+                .withDockerCertPath("./certs")
                 .withDockerConfig("/home/user/.docker")
-                //.withApiVersion("1.30") // optional
+                .withApiVersion("1.30") // optional
                 .withRegistryUrl("https://hub.docker.com/")
                 .withRegistryUsername("knowden")
                 .withRegistryPassword("Drugs2bb2.love")
@@ -24,7 +24,7 @@ public class DockerClientFactory {
     }
 
     public static synchronized DockerClient getDockerClient(String ip) {
-        DefaultDockerClientConfig config = configBuilder.withDockerHost(String.format("tcp://%s:2375", ip)).build();
+        DefaultDockerClientConfig config = configBuilder.withDockerHost(String.format("tcp://%s:2376", ip)).build();
         return DockerClientBuilder.getInstance(config).build();
     }
 }
