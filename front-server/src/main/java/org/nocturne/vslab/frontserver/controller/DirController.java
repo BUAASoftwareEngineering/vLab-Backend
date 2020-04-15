@@ -45,4 +45,47 @@ public class DirController {
 
         return new HttpSender(container.getIp(), container.getServerPort(), "/dir/delete", params).post();
     }
+
+    @PostMapping("/move")
+    public String moveDir(@RequestParam(PARAM_PROJECT_ID) Integer projectId,
+                          @RequestParam(PARAM_DIR_OLD_PATH) String oldPath,
+                          @RequestParam(PARAM_DIR_NEW_PATH) String newPath,
+                          @RequestParam(value = "force", defaultValue = "false") Boolean force) throws IOException {
+        Container container = containerMapper.getContainerById(projectId);
+
+        Map<String, String> params = new HashMap<>();
+        params.put(PARAM_DIR_OLD_PATH, oldPath);
+        params.put(PARAM_DIR_NEW_PATH, newPath);
+        params.put("force", force.toString());
+
+        return new HttpSender(container.getIp(), container.getServerPort(), "/dir/move", params).post();
+    }
+
+    @PostMapping("/copy")
+    public String copyDir(@RequestParam(PARAM_PROJECT_ID) Integer projectId,
+                          @RequestParam(PARAM_DIR_OLD_PATH) String oldPath,
+                          @RequestParam(PARAM_DIR_NEW_PATH) String newPath,
+                          @RequestParam(value = "force", defaultValue = "false") Boolean force) throws IOException {
+        Container container = containerMapper.getContainerById(projectId);
+
+        Map<String, String> params = new HashMap<>();
+        params.put(PARAM_DIR_OLD_PATH, oldPath);
+        params.put(PARAM_DIR_NEW_PATH, newPath);
+        params.put("force", force.toString());
+
+        return new HttpSender(container.getIp(), container.getServerPort(), "/dir/copy", params).post();
+    }
+
+    @PostMapping("/rename")
+    public String renameDir(@RequestParam(PARAM_PROJECT_ID) Integer projectId,
+                          @RequestParam(PARAM_DIR_OLD_PATH) String oldPath,
+                          @RequestParam(PARAM_DIR_NEW_PATH) String newPath) throws IOException {
+        Container container = containerMapper.getContainerById(projectId);
+
+        Map<String, String> params = new HashMap<>();
+        params.put(PARAM_DIR_OLD_PATH, oldPath);
+        params.put(PARAM_DIR_NEW_PATH, newPath);
+
+        return new HttpSender(container.getIp(), container.getServerPort(), "/dir/rename", params).post();
+    }
 }

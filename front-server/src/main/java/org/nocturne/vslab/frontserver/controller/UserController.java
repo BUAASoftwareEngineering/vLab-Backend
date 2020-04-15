@@ -63,8 +63,8 @@ public class UserController {
     @PostMapping("/info_update")
     public Result infoUpdate(HttpServletResponse response,
                              @CookieValue(PARAM_USER_ID) Integer userId,
-                             @RequestParam(PARAM_USER_NAME) String username,
-                             @RequestParam(PARAM_USER_PASSWORD) String password) {
+                             @RequestParam(value = PARAM_USER_NAME, required = false) String username,
+                             @RequestParam(value = PARAM_USER_PASSWORD, required = false) String password) {
         User user = new User(userId, username, DigestUtils.md5DigestAsHex(password.getBytes()));
         userService.updateUser(user);
 

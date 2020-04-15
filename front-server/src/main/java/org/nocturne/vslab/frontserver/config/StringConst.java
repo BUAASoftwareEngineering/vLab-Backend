@@ -20,4 +20,6 @@ public class StringConst {
     public static final String PARAM_FILE_CONTENT = "file_content";
 
     public static final String PARAM_DIR_PATH = "dir_path";
+    public static final String PARAM_DIR_OLD_PATH = "old_path";
+    public static final String PARAM_DIR_NEW_PATH = "new_path";
 }

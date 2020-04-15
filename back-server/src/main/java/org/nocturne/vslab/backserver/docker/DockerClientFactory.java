@@ -16,11 +16,7 @@ public class DockerClientFactory {
                 .withDockerTlsVerify(true)
                 .withDockerCertPath("./certs")
                 .withDockerConfig("/home/user/.docker")
-                .withApiVersion("1.30") // optional
-                .withRegistryUrl("https://hub.docker.com/")
-                .withRegistryUsername("knowden")
-                .withRegistryPassword("Drugs2bb2.love")
-                .withRegistryEmail("853172766@qq.com");
+                .withApiVersion("1.30"); // optional
     }
 
     public static synchronized DockerClient getDockerClient(String ip) {

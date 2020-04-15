@@ -4,10 +4,7 @@ import org.nocturne.vslab.api.entity.Container;
 import org.nocturne.vslab.frontserver.mapper.ContainerMapper;
 import org.nocturne.vslab.frontserver.util.HttpSender;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -17,7 +14,7 @@ import java.util.Map;
 import static org.nocturne.vslab.frontserver.config.StringConst.*;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*", allowCredentials = "true")
-@Controller
+@RestController
 @RequestMapping("/file")
 public class FileController {
 
@@ -88,12 +85,14 @@ public class FileController {
     @PostMapping("/move")
     public String moveFile(@RequestParam(PARAM_PROJECT_ID) Integer projectId,
                            @RequestParam(PARAM_FILE_OLD_PATH) String oldPath,
-                           @RequestParam(PARAM_FILE_NEW_PATH) String newPath) throws IOException {
+                           @RequestParam(PARAM_FILE_NEW_PATH) String newPath,
+                           @RequestParam(value = "force", defaultValue = "false") Boolean force) throws IOException {
         Container container = containerMapper.getContainerById(projectId);
 
         Map<String, String> params = new HashMap<>();
         params.put(PARAM_FILE_OLD_PATH, oldPath);
         params.put(PARAM_FILE_NEW_PATH, newPath);
+        params.put("force", force.toString());
 
         return new HttpSender(container.getIp(), container.getServerPort(), "/file/move", params).post();
     }
@@ -101,13 +100,28 @@ public class FileController {
     @PostMapping("/copy")
     public String copyFile(@RequestParam(PARAM_PROJECT_ID) Integer projectId,
                            @RequestParam(PARAM_FILE_OLD_PATH) String oldPath,
-                           @RequestParam(PARAM_FILE_NEW_PATH) String newPath) throws IOException {
+                           @RequestParam(PARAM_FILE_NEW_PATH) String newPath,
+                           @RequestParam(value = "force", defaultValue = "false") Boolean force) throws IOException {
+        Container container = containerMapper.getContainerById(projectId);
+
+        Map<String, String> params = new HashMap<>();
+        params.put(PARAM_FILE_OLD_PATH, oldPath);
+        params.put(PARAM_FILE_NEW_PATH, newPath);
+        params.put("force", force.toString());
+
+        return new HttpSender(container.getIp(), container.getServerPort(), "/file/copy", params).post();
+    }
+
+    @PostMapping("/rename")
+    public String renameFile(@RequestParam(PARAM_PROJECT_ID) Integer projectId,
+                             @RequestParam(PARAM_FILE_OLD_PATH) String oldPath,
+                             @RequestParam(PARAM_FILE_NEW_PATH) String newPath) throws IOException {
         Container container = containerMapper.getContainerById(projectId);
 
         Map<String, String> params = new HashMap<>();
         params.put(PARAM_FILE_OLD_PATH, oldPath);
         params.put(PARAM_FILE_NEW_PATH, newPath);
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/file/copy", params).post();
+        return new HttpSender(container.getIp(), container.getServerPort(), "/file/rename", params).post();
     }
 }

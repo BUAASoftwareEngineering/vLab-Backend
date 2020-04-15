@@ -33,10 +33,14 @@ public class ProjectAuthorizeAspect {
     @Pointcut("execution(public * org.nocturne.vslab.frontserver.controller.ProjectController.enterProject(..)) ||" +
             "execution(public * org.nocturne.vslab.frontserver.controller.ProjectController.exitProject(..)) ||" +
             "execution(public * org.nocturne.vslab.frontserver.controller.ProjectController.destroyProject(..))")
-    public void authorityCheckMethod() {}
+    public void projectControllerMethods() {}
 
-    @Around("authorityCheckMethod()")
-    public Result checkProjectAuthority(ProceedingJoinPoint joinPoint) throws Throwable {
+    @Pointcut("execution(public * org.nocturne.vslab.frontserver.controller.DirController.*(..)) ||" +
+            "execution(public * org.nocturne.vslab.frontserver.controller.FileController.*(..))")
+    public void fileAndDirControllerMethods() {}
+
+    @Around("projectControllerMethods() || fileAndDirControllerMethods()")
+    public String checkProjectAuthority(ProceedingJoinPoint joinPoint) throws Throwable {
         Integer projectId = (Integer) joinPoint.getArgs()[0];
         Integer userId = getRequestUserId();
 
@@ -49,7 +53,7 @@ public class ProjectAuthorizeAspect {
             throw new ProjectNotFoundException();
         }
 
-        return (Result) joinPoint.proceed();
+        return joinPoint.proceed().toString();
     }
 
     private Integer getRequestUserId() {

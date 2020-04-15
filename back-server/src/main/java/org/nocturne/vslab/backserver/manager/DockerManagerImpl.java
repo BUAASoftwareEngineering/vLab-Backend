@@ -50,7 +50,7 @@ public class DockerManagerImpl implements DockerManager {
 
         DockerClient dockerClient = DockerClientFactory.getDockerClient(ip);
         CreateContainerResponse response = dockerClient
-                .createContainerCmd("mysql:5.7")
+                .createContainerCmd("vlab-base:1.0")
                 .withExposedPorts(exposedPortList)
                 .withEnv("MYSQL_ROOT_PASSWORD=123")
                 .withHostConfig(HostConfig.newHostConfig().withPortBindings(portBindings).withPublishAllPorts(false))
