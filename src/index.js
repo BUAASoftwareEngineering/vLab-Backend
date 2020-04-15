@@ -9,8 +9,8 @@ server.listen(port, function () {
 })
 
 server.on('request', function (req, res) {
-    res.setHeader("Access-Control-Allow-Credentials","true")
-    res.setHeader("Access-Control-Allow-Origin", req.headers.origin)
+    // res.setHeader("Access-Control-Allow-Credentials","true")
+    // res.setHeader("Access-Control-Allow-Origin", req.headers.origin)
     console.log('[%s]* receive request from %s', time(), req.headers.origin)
     if (req.method == 'GET') {
         let response = {}
