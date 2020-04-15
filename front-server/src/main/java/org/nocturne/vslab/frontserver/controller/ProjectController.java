@@ -19,7 +19,7 @@ import java.util.List;
 @RequestMapping("/project")
 public class ProjectController {
 
-    //@Reference(interfaceName = "dockerManager")
+    @Reference(interfaceName = "dockerManager")
     private DockerManager dockerManager;
 
     private ContainerMapper containerMapper;

@@ -40,7 +40,7 @@ public class UserAuthorizeAspect {
             HttpServletRequest request = attributes.getRequest();
 
             Cookie[] cookies = request.getCookies();
-            Integer userId = Integer.parseInt(getCookieValue(cookies, "user_id"));
+            Integer userId = Integer.parseInt(Objects.requireNonNull(getCookieValue(cookies, "user_id")));
             String userToken = getCookieValue(cookies, "user_token");
 
             if (!userTokenPool.isUserTokenAccepted(userId, userToken)) {

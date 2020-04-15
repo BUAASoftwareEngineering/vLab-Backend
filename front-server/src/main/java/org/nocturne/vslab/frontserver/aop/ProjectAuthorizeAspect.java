@@ -39,8 +39,19 @@ public class ProjectAuthorizeAspect {
             "execution(public * org.nocturne.vslab.frontserver.controller.FileController.*(..))")
     public void fileAndDirControllerMethods() {}
 
-    @Around("projectControllerMethods() || fileAndDirControllerMethods()")
-    public String checkProjectAuthority(ProceedingJoinPoint joinPoint) throws Throwable {
+    @Around("projectControllerMethods()")
+    public Result checkProjectAuthorityForProject(ProceedingJoinPoint joinPoint) throws Throwable {
+        doCheck(joinPoint);
+        return (Result) joinPoint.proceed();
+    }
+
+    @Around("fileAndDirControllerMethods()")
+    public String checkProjectAuthorityForFile(ProceedingJoinPoint joinPoint) throws Throwable {
+        doCheck(joinPoint);
+        return joinPoint.proceed().toString();
+    }
+
+    private void doCheck(ProceedingJoinPoint joinPoint) {
         Integer projectId = (Integer) joinPoint.getArgs()[0];
         Integer userId = getRequestUserId();
 
@@ -52,8 +63,6 @@ public class ProjectAuthorizeAspect {
         } catch (Exception e) {
             throw new ProjectNotFoundException();
         }
-
-        return joinPoint.proceed().toString();
     }
 
     private Integer getRequestUserId() {
