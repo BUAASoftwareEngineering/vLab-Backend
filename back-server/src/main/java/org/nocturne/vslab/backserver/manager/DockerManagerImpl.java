@@ -32,8 +32,8 @@ public class DockerManagerImpl implements DockerManager {
     private static Ports portBindings = new Ports();
 
     static {
+        exposedPortList.add(ExposedPort.tcp(3000));
         exposedPortList.add(ExposedPort.tcp(10000));
-        exposedPortList.add(ExposedPort.tcp(20000));
         portBindings.bind(exposedPortList.get(0), Ports.Binding.empty());
         portBindings.bind(exposedPortList.get(1), Ports.Binding.empty());
     }
@@ -52,7 +52,6 @@ public class DockerManagerImpl implements DockerManager {
         CreateContainerResponse response = dockerClient
                 .createContainerCmd("vlab-base:1.0")
                 .withExposedPorts(exposedPortList)
-                .withEnv("MYSQL_ROOT_PASSWORD=123")
                 .withHostConfig(HostConfig.newHostConfig().withPortBindings(portBindings).withPublishAllPorts(false))
                 .exec();
         String containerId = response.getId().substring(0, 12);
@@ -125,7 +124,7 @@ public class DockerManagerImpl implements DockerManager {
         List<Integer> portList = new ArrayList<>();
 
         try {
-            Process process = Runtime.getRuntime().exec(String.format("docker -H tcp://%s port %s", ip, containerId));
+            Process process = Runtime.getRuntime().exec(String.format("docker --tlsverify --tlscacert=./certs/ca.pem --tlscert=./certs/cert.pem --tlskey=./certs/key.pem -H tcp://%s:2376 port %s", ip, containerId));
             BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while ((line = input.readLine()) != null) {

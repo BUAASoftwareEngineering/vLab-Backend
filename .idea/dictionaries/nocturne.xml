@@ -7,6 +7,10 @@
       <w>frontserver</w>
       <w>ibatis</w>
       <w>knowden</w>
+      <w>tlscacert</w>
+      <w>tlscert</w>
+      <w>tlskey</w>
+      <w>tlsverify</w>
       <w>vlab</w>
       <w>vslab</w>
     </words>
