@@ -21,19 +21,24 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service(interfaceName = "dockerManager")
 @Component
 public class DockerManagerImpl implements DockerManager {
+
+    private static final Integer CONTAINER_SERVER_PORT = 3000;
+    private static final Integer TERMINAL_PORT = 10000;
 
     private ContainerMapper containerMapper;
     private static List<ExposedPort> exposedPortList = new ArrayList<>();
     private static Ports portBindings = new Ports();
 
     static {
-        exposedPortList.add(ExposedPort.tcp(3000));
-        exposedPortList.add(ExposedPort.tcp(10000));
+        exposedPortList.add(ExposedPort.tcp(CONTAINER_SERVER_PORT));
+        exposedPortList.add(ExposedPort.tcp(TERMINAL_PORT));
         portBindings.bind(exposedPortList.get(0), Ports.Binding.empty());
         portBindings.bind(exposedPortList.get(1), Ports.Binding.empty());
     }
@@ -79,18 +84,18 @@ public class DockerManagerImpl implements DockerManager {
         DockerClient dockerClient = DockerClientFactory.getDockerClient(container.getIp());
         dockerClient.startContainerCmd(container.getContainerId()).exec();
 
-        List<Integer> portList = getBindingPortsOfContainer(container.getIp(), container.getContainerId());
-        while (portList.isEmpty()) {
+        Map<Integer, Integer> portMap = getBindingPortsOfContainer(container.getIp(), container.getContainerId());
+        while (portMap.isEmpty()) {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            portList = getBindingPortsOfContainer(container.getIp(), container.getContainerId());
+            portMap = getBindingPortsOfContainer(container.getIp(), container.getContainerId());
         }
 
-        container.setServerPort(portList.get(0));
-        container.setTerminalPort(portList.get(1));
+        container.setServerPort(portMap.get(CONTAINER_SERVER_PORT));
+        container.setTerminalPort(portMap.get(TERMINAL_PORT));
 
         containerMapper.updateContainer(container);
         return true;
@@ -120,26 +125,30 @@ public class DockerManagerImpl implements DockerManager {
         return true;
     }
 
-    private List<Integer> getBindingPortsOfContainer(String ip, String containerId) {
-        List<Integer> portList = new ArrayList<>();
+    private Map<Integer, Integer> getBindingPortsOfContainer(String ip, String containerId) {
+        Map<Integer, Integer> portMap = new HashMap<>();
 
         try {
             Process process = Runtime.getRuntime().exec(String.format("docker --tlsverify --tlscacert=./certs/ca.pem --tlscert=./certs/cert.pem --tlskey=./certs/key.pem -H tcp://%s:2376 port %s", ip, containerId));
             BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while ((line = input.readLine()) != null) {
-                portList.add(getPortFromOriginalInfo(line));
+                addPortMapEntry(line, portMap);
             }
             input.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return portList;
+        return portMap;
     }
 
-    private Integer getPortFromOriginalInfo(String originalInfo) {
-        String mainInfo = originalInfo.split(" ")[2];
-        return Integer.parseInt(mainInfo.split(":")[1]);
+    private void addPortMapEntry(String originalInfo, Map<Integer, Integer> portMap) {
+        String[] infos = originalInfo.split(" ");
+
+        Integer innerPort = Integer.parseInt(infos[0].split("/")[0]);
+        Integer hostPort = Integer.parseInt(infos[2].split(":")[1]);
+
+        portMap.put(innerPort, hostPort);
     }
 }
