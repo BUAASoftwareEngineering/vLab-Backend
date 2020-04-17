@@ -32,7 +32,8 @@ public class ProjectAuthorizeAspect {
 
     @Pointcut("execution(public * org.nocturne.vslab.frontserver.controller.ProjectController.enterProject(..)) ||" +
             "execution(public * org.nocturne.vslab.frontserver.controller.ProjectController.exitProject(..)) ||" +
-            "execution(public * org.nocturne.vslab.frontserver.controller.ProjectController.destroyProject(..))")
+            "execution(public * org.nocturne.vslab.frontserver.controller.ProjectController.destroyProject(..)) ||" +
+            "execution(public * org.nocturne.vslab.frontserver.controller.ProjectController.updateProjectInfo(..))")
     public void projectControllerMethods() {}
 
     @Pointcut("execution(public * org.nocturne.vslab.frontserver.controller.DirController.*(..)) ||" +

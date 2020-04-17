@@ -4,7 +4,6 @@ import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.HostConfig;
-import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
 import org.apache.dubbo.config.annotation.Service;
 import org.nocturne.vslab.api.entity.Container;
@@ -30,7 +29,7 @@ import java.util.Map;
 public class DockerManagerImpl implements DockerManager {
 
     private static final Integer CONTAINER_SERVER_PORT = 3000;
-    private static final Integer TERMINAL_PORT = 10000;
+    private static final Integer TERMINAL_PORT = 4001;
 
     private ContainerMapper containerMapper;
     private static List<ExposedPort> exposedPortList = new ArrayList<>();
@@ -55,7 +54,7 @@ public class DockerManagerImpl implements DockerManager {
 
         DockerClient dockerClient = DockerClientFactory.getDockerClient(ip);
         CreateContainerResponse response = dockerClient
-                .createContainerCmd("vlab-base:1.0")
+                .createContainerCmd("nocturne/vlab-base:1.1")
                 .withExposedPorts(exposedPortList)
                 .withHostConfig(HostConfig.newHostConfig().withPortBindings(portBindings).withPublishAllPorts(false))
                 .exec();

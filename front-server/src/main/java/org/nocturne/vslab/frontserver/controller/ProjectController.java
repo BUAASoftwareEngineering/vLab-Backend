@@ -4,7 +4,6 @@ import org.apache.dubbo.config.annotation.Reference;
 import org.nocturne.vslab.api.entity.Container;
 import org.nocturne.vslab.api.entity.ImageType;
 import org.nocturne.vslab.api.manager.DockerManager;
-import org.nocturne.vslab.api.manager.FileManager;
 import org.nocturne.vslab.frontserver.bean.Result;
 import org.nocturne.vslab.frontserver.mapper.ContainerMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,16 +43,25 @@ public class ProjectController {
         return new Result(0, "创建成功", container);
     }
 
+    @PostMapping("/info_update")
+    public Result updateProjectInfo(@RequestParam(PARAM_PROJECT_ID) Integer projectId,
+                                    @RequestParam(PARAM_PROJECT_NAME) String projectName) {
+        containerMapper.updateContainerName(projectId, projectName);
+        Container container = containerMapper.getContainerById(projectId);
+        return new Result(0, "更新成功", container);
+    }
+
     @PostMapping("/enter")
     public Result enterProject(@RequestParam(PARAM_PROJECT_ID) Integer projectId) {
         dockerManager.startContainer(projectId);
-        return new Result(0, "启动成功", null);
+        Container container = containerMapper.getContainerById(projectId);
+        return new Result(0, "启动成功", container);
     }
 
     @PostMapping("/exit")
     public Result exitProject(@RequestParam(PARAM_PROJECT_ID) Integer projectId) {
          dockerManager.stopContainer(projectId);
-        return new Result(0, "关闭成功", null);
+         return new Result(0, "关闭成功", null);
     }
 
     @PostMapping("/delete")

@@ -25,4 +25,10 @@
         WHERE project_id = #{projectId}
     </select>
 
+    <!-- public void updateContainerName(@Param("projectId") Integer projectId, @Param("projectName") String projectName);-->
+    <update id="updateContainerName">
+        UPDATE tb_container SET container_name = #{projectName} WHERE project_id = #{projectId}
+    </update>
+
+
 </mapper>
