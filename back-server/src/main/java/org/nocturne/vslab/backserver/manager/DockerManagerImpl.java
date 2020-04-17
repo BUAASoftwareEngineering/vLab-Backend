@@ -30,6 +30,7 @@ public class DockerManagerImpl implements DockerManager {
 
     private static final Integer CONTAINER_SERVER_PORT = 3000;
     private static final Integer TERMINAL_PORT = 4001;
+    private static final Integer LANGUAGE_PORT = 10000;
 
     private ContainerMapper containerMapper;
     private static List<ExposedPort> exposedPortList = new ArrayList<>();
@@ -38,8 +39,10 @@ public class DockerManagerImpl implements DockerManager {
     static {
         exposedPortList.add(ExposedPort.tcp(CONTAINER_SERVER_PORT));
         exposedPortList.add(ExposedPort.tcp(TERMINAL_PORT));
+        exposedPortList.add(ExposedPort.tcp(LANGUAGE_PORT));
         portBindings.bind(exposedPortList.get(0), Ports.Binding.empty());
         portBindings.bind(exposedPortList.get(1), Ports.Binding.empty());
+        portBindings.bind(exposedPortList.get(2), Ports.Binding.empty());
     }
 
     @Autowired
@@ -60,15 +63,9 @@ public class DockerManagerImpl implements DockerManager {
                 .exec();
         String containerId = response.getId().substring(0, 12);
 
-        Container container = new Container(
-                null,
-                containerId,
-                userId,
-                imageType,
-                containerName,
-                ip,
-                0,
-                0);
+        Container container = new Container(null, containerId, userId,
+                imageType, containerName,
+                ip, 0, 0, 0);
 
         containerMapper.createContainer(container);
 
@@ -95,6 +92,7 @@ public class DockerManagerImpl implements DockerManager {
 
         container.setServerPort(portMap.get(CONTAINER_SERVER_PORT));
         container.setTerminalPort(portMap.get(TERMINAL_PORT));
+        container.setLanguagePort(portMap.get(LANGUAGE_PORT));
 
         containerMapper.updateContainer(container);
         return true;

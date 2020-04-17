@@ -30,6 +30,7 @@ public class Container implements Serializable {
 
     private Integer serverPort;
     private Integer terminalPort;
+    private Integer languagePort;
 
     public static String getActualContainerName(String name, Integer projectId) {
         return String.format("%s_%d", name, projectId);

@@ -12,17 +12,17 @@
         <result column="ip" property="ip"/>
         <result column="terminal_port" property="terminalPort"/>
         <result column="server_port" property="serverPort"/>
+        <result column="language_port" property="languagePort"/>
     </resultMap>
 
-    <!--public List<Container> getContainersOfUser(Integer userId);-->
+    <!-- public List<Container> getContainersOfUser(Integer userId);-->
     <select id="getContainersOfUser" resultMap="baseResultMap">
         SELECT * FROM tb_container WHERE user_id = #{userId}
     </select>
 
-    <!--public Container getContainerById(Integer projectId);-->
+    <!-- public Container getContainerById(Integer projectId);-->
     <select id="getContainerById" resultMap="baseResultMap">
-        SELECT * FROM tb_container
-        WHERE project_id = #{projectId}
+        SELECT * FROM tb_container WHERE project_id = #{projectId}
     </select>
 
     <!-- public void updateContainerName(@Param("projectId") Integer projectId, @Param("projectName") String projectName);-->
