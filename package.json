@@ -2,10 +2,10 @@
   "name": "web_terminal_server",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.js",
+  "main": "/home/terminal/src/index.js",
   "scripts": {
-    "start": "pm2 start src\\index.js",
-    "debug": "node src\\index.js"
+    "start": "pm2 start /home/terminal/src/index.js",
+    "debug": "node /home/terminal/src/index.js"
   },
   "author": "PX L",
   "dependencies": {

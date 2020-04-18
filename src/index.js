@@ -2,11 +2,14 @@ const pty = require('node-pty');
 const os = require('os');
 const WebSocket = require('ws');
 const { time } = require('./date')
+const spawnSync = require('child_process').spawnSync
 const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
 
-const wss = new WebSocket.Server({port: 4001});
 
-// console.log('begin')
+const wss = new WebSocket.Server({port: 4000});
+const counter = {}
+counter.count = 0
+
 
 wss.on('listening', function () {
     console.log('[%s]* terminal service init success!', time())
@@ -25,7 +28,9 @@ wss.on('connection', (ws) => {
     cwd: process.env.HOME,
     env: process.env
   });
+  counter.count += 1
   
+    
   ws.on('message', (res) => {
     ptyProcess.write(res)
   });
@@ -34,4 +39,17 @@ wss.on('connection', (ws) => {
     process.stdout.write(data);
     ws.send(data)
   });
+
+  ws.on('close', function(err) {
+    counter.count -= 1
+    if (counter.count <= 0) {
+      // console.log('close docker now!!')
+      spawnSync('close.sh')
+    }
+  })
+});
+
+process.on('uncaughtException', function (err) {
+  // console.log('close docker now!')
+  spawnSync('close.sh')
 });
