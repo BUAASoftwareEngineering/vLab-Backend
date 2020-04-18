@@ -29,8 +29,10 @@ import java.util.Map;
 public class DockerManagerImpl implements DockerManager {
 
     private static final Integer CONTAINER_SERVER_PORT = 3000;
-    private static final Integer TERMINAL_PORT = 4001;
-    private static final Integer LANGUAGE_PORT = 10000;
+    private static final Integer TERMINAL_PORT = 4000;
+    private static final Integer LANGUAGE_PORT = 5000;
+
+    private static final String IMAGE_NAME = "vlab-base";
 
     private ContainerMapper containerMapper;
     private static List<ExposedPort> exposedPortList = new ArrayList<>();
@@ -57,7 +59,7 @@ public class DockerManagerImpl implements DockerManager {
 
         DockerClient dockerClient = DockerClientFactory.getDockerClient(ip);
         CreateContainerResponse response = dockerClient
-                .createContainerCmd("nocturne/vlab-base:1.1")
+                .createContainerCmd(IMAGE_NAME)
                 .withExposedPorts(exposedPortList)
                 .withHostConfig(HostConfig.newHostConfig().withPortBindings(portBindings).withPublishAllPorts(false))
                 .exec();
