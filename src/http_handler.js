@@ -1,4 +1,6 @@
 const fs = require('fs')
+const TextDecoder = require('util').TextDecoder
+const TextEncoder = require('util').TextEncoder
 const spawnSync = require('child_process').spawnSync
 
 function solve_data(data) {
@@ -6,13 +8,20 @@ function solve_data(data) {
     let params = data.split('&')
     for (let i = 0; i < params.length; i = i + 1) {
         let key_value = params[i].split('=')
-        obj += decodeURIComponent(key_value[0]).trim() + ':"' + decodeURIComponent(key_value[1]).trim() + '"'
+        if (decodeURIComponent(key_value[0]).trim() != 'file_content') {
+            // console.log('www')
+            obj += '"' + decodeURIComponent(key_value[0]).trim() + '":"' + decodeURIComponent(key_value[1]).trim() + '"'
+        } else {
+            // console.log('here!')
+            obj += '"' + decodeURIComponent(key_value[0]).trim() + '":' + decodeURIComponent(key_value[1]).trim()
+        }
         if (i != params.length - 1) {
             obj += ','
         }
     }
     obj = '{' + obj + '}'
-    obj = eval('(' + obj + ')')
+    obj = JSON.parse(obj)
+    // console.log(obj)
     return obj
 }
 
@@ -48,13 +57,13 @@ function file_struct(data) {
 function file_content(data) {
     let obj = solve_data(data)
     let path = obj.file_path
-    
+    console.log(new TextEncoder('utf-8').encode(fs.readFileSync(path, 'utf-8')).buffer)
     return {
         code: 0,
         message: 'file content success!',
         data: {
             path: path,
-            content: fs.readFileSync(path, 'utf-8')
+            content: Buffer.from(new TextEncoder('utf-8').encode(fs.readFileSync(path, 'utf-8')))
         }
     }
         
@@ -64,7 +73,7 @@ function file_update(data) {
     let obj = solve_data(data)
     let path = obj.file_path
     
-    fs.writeFileSync(path, obj.file_content, 'utf-8')
+    fs.writeFileSync(path, new TextDecoder('utf-8').decode(Buffer.from(obj.file_content, 'utf-8')))
     return {
         code: 0,
         message: 'file update success!',
