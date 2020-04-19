@@ -9,6 +9,12 @@ const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
 const wss = new WebSocket.Server({port: 4000});
 const counter = {}
 counter.count = 0
+counter.connect = false
+setTimeout(function() {
+  // if (counter.connect == false) {
+  //   spawnSync('/home/terminal/close.sh')
+  // }
+}, 30000)
 
 
 wss.on('listening', function () {
@@ -21,6 +27,7 @@ wss.on('close', function () {
 
 wss.on('connection', (ws) => {
   console.log('[%s]* socket connection success', time());
+  counter.connect = true
   const ptyProcess = pty.spawn(shell, [], {
     name: 'xterm-color',
     cols: 150,
@@ -44,12 +51,12 @@ wss.on('connection', (ws) => {
     counter.count -= 1
     if (counter.count <= 0) {
       // console.log('close docker now!!')
-      spawnSync('close.sh')
+      spawnSync('/home/terminal/close.sh')
     }
   })
 });
 
 process.on('uncaughtException', function (err) {
   // console.log('close docker now!')
-  spawnSync('close.sh')
+  spawnSync('/home/terminal/close.sh')
 });

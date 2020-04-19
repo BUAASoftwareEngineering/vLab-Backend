@@ -21,11 +21,11 @@ npm install
 ## Debug
 
 ```
-npm run debug
+node src/index.js
 ```
 
 ## Release
 
 ```
-npm run start
+pm2 start src/index.js
 ```
