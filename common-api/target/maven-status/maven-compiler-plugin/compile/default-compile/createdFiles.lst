@@ -3,6 +3,7 @@ org/nocturne/vslab/api/entity/ImageType.class
 org/nocturne/vslab/api/entity/File$FileBuilder.class
 org/nocturne/vslab/api/manager/FileManager.class
 org/nocturne/vslab/api/entity/User.class
+org/nocturne/vslab/api/entity/ImageType$1.class
 org/nocturne/vslab/api/entity/File.class
 org/nocturne/vslab/api/manager/DockerManager.class
 org/nocturne/vslab/api/entity/File$FileType.class

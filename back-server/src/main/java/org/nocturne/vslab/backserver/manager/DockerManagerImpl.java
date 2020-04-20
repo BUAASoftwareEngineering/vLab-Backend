@@ -32,8 +32,6 @@ public class DockerManagerImpl implements DockerManager {
     private static final Integer TERMINAL_PORT = 4000;
     private static final Integer LANGUAGE_PORT = 5000;
 
-    private static final String IMAGE_NAME = "vlab-base";
-
     private ContainerMapper containerMapper;
     private static List<ExposedPort> exposedPortList = new ArrayList<>();
     private static Ports portBindings = new Ports();
@@ -59,7 +57,7 @@ public class DockerManagerImpl implements DockerManager {
 
         DockerClient dockerClient = DockerClientFactory.getDockerClient(ip);
         CreateContainerResponse response = dockerClient
-                .createContainerCmd(IMAGE_NAME)
+                .createContainerCmd(imageType.getImageName())
                 .withExposedPorts(exposedPortList)
                 .withHostConfig(HostConfig.newHostConfig().withPortBindings(portBindings).withPublishAllPorts(false))
                 .exec();
