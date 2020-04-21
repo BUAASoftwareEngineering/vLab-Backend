@@ -5,6 +5,8 @@
 ```
 yum -y install nodejs npm
 npm install pm2
+cd /home/container-server/
+npm install express
 ```
 
 ## Usage
