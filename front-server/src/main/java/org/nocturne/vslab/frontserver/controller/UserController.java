@@ -65,7 +65,7 @@ public class UserController {
                              @CookieValue(PARAM_USER_ID) Integer userId,
                              @RequestParam(value = PARAM_USER_NAME, required = false) String username,
                              @RequestParam(value = PARAM_USER_PASSWORD, required = false) String password) {
-        User user = new User(userId, username, DigestUtils.md5DigestAsHex(password.getBytes()));
+        User user = new User(userId, username, password == null ? null : DigestUtils.md5DigestAsHex(password.getBytes()));
         userService.updateUser(user);
 
         setCookie(response, COOKIE_USER_NAME, user.getName());
