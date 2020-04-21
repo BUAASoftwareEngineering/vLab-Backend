@@ -12,14 +12,16 @@ function solve_data(data) {
             // console.log('www')
             obj += '"' + decodeURIComponent(key_value[0]).trim() + '":"' + decodeURIComponent(key_value[1]).trim() + '"'
         } else {
-            // console.log('here!')
+            console.log('here!')
             obj += '"' + decodeURIComponent(key_value[0]).trim() + '":' + decodeURIComponent(key_value[1]).trim()
+            console.log(decodeURIComponent(key_value[1]).trim())
         }
         if (i != params.length - 1) {
             obj += ','
         }
     }
     obj = '{' + obj + '}'
+    console.log(obj)
     obj = JSON.parse(obj)
     // console.log(obj)
     return obj
@@ -70,10 +72,10 @@ function file_content(data) {
 }
 
 function file_update(data) {
-    let obj = solve_data(data)
+    let obj = data
     let path = obj.file_path
-    
-    fs.writeFileSync(path, new TextDecoder('utf-8').decode(Buffer.from(obj.file_content, 'utf-8')))
+    console.log(obj)
+    fs.writeFileSync(path, new TextDecoder('utf-8').decode(Buffer.from(JSON.parse(obj.file_content), 'utf-8')))
     return {
         code: 0,
         message: 'file update success!',
@@ -83,7 +85,7 @@ function file_update(data) {
 }
 
 function file_new(data) {
-    let obj = solve_data(data)
+    let obj = data
     let path = obj.file_path
     if (fs.existsSync(path)) {
         return {
@@ -101,7 +103,7 @@ function file_new(data) {
 }
 
 function file_delete(data) {
-    let obj = solve_data(data)
+    let obj = data
     let path = obj.file_path
     
     fs.unlinkSync(path)
@@ -114,7 +116,7 @@ function file_delete(data) {
 }
 
 function file_move(data) {
-    let obj = solve_data(data)
+    let obj = data
     let old_path = obj.old_path
     let new_path = obj.new_path
     let force = JSON.parse(obj.force)
@@ -154,7 +156,7 @@ function file_move(data) {
 }
 
 function file_copy(data) {
-    let obj = solve_data(data)
+    let obj = data
     let old_path = obj.old_path
     let new_path = obj.new_path
     let force = JSON.parse(obj.force)
@@ -195,7 +197,7 @@ function file_copy(data) {
 }
 
 function file_rename(data) {
-    let obj = solve_data(data)
+    let obj = data
     let old_path = obj.old_path
     let new_path = obj.new_path
 
@@ -216,7 +218,7 @@ function file_rename(data) {
 }
 
 function dir_new(data) {
-    let obj = solve_data(data)
+    let obj = data
     let dir_path = obj.dir_path
     if (fs.existsSync(dir_path)) {
         return {
@@ -234,7 +236,7 @@ function dir_new(data) {
 }
 
 function dir_delete(data) {
-    let obj = solve_data(data)
+    let obj = data
     let dir_path = obj.dir_path
     
     let ret = spawnSync('rm',['-rf',dir_path])
@@ -262,7 +264,7 @@ function dir_delete(data) {
 }
 
 function dir_move(data) {
-    let obj = solve_data(data)
+    let obj = data
     let old_path = obj.old_path
     let new_path = obj.new_path
     let force = JSON.parse(obj.force)
@@ -318,7 +320,7 @@ function dir_move(data) {
 }
 
 function dir_copy(data) {
-    let obj = solve_data(data)
+    let obj = data
     let old_path = obj.old_path
     let new_path = obj.new_path
     let force = JSON.parse(obj.force)
@@ -374,7 +376,7 @@ function dir_copy(data) {
 }
 
 function dir_rename(data) {
-    let obj = solve_data(data)
+    let obj = data
     let old_path = obj.old_path
     let new_path = obj.new_path
 

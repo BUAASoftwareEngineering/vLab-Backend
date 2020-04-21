@@ -40,6 +40,7 @@ node src/index.js
 - `2020-04-12`：项目结构构建，index.js分配处理请求以及response，http_handler.js处理具体请求
 - `2020-04-14`：file接口设计完成，错误码定义完成，本地测试通过
 - `2020-04-15`：测试完成，添加`setup.sh`作为构建项目脚本
+- `2020-04-21`：修复file_update和file_content的bug
 
 ## TODO
 
