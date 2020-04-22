@@ -49,7 +49,7 @@ public class DockerManagerImpl implements DockerManager {
         hostConfig = HostConfig.newHostConfig()
                 .withPortBindings(portBindings)
                 .withPublishAllPorts(false)
-                .withMemory(200L);
+                .withMemory(200 * 1024 * 1024L);
     }
 
     @Autowired
