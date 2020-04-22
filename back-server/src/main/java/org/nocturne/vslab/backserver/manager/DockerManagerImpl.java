@@ -34,15 +34,22 @@ public class DockerManagerImpl implements DockerManager {
 
     private ContainerMapper containerMapper;
     private static List<ExposedPort> exposedPortList = new ArrayList<>();
-    private static Ports portBindings = new Ports();
+    private static HostConfig hostConfig;
 
     static {
         exposedPortList.add(ExposedPort.tcp(CONTAINER_SERVER_PORT));
         exposedPortList.add(ExposedPort.tcp(TERMINAL_PORT));
         exposedPortList.add(ExposedPort.tcp(LANGUAGE_PORT));
+
+        Ports portBindings = new Ports();
         portBindings.bind(exposedPortList.get(0), Ports.Binding.empty());
         portBindings.bind(exposedPortList.get(1), Ports.Binding.empty());
         portBindings.bind(exposedPortList.get(2), Ports.Binding.empty());
+
+        hostConfig = HostConfig.newHostConfig()
+                .withPortBindings(portBindings)
+                .withPublishAllPorts(false)
+                .withMemory(200L);
     }
 
     @Autowired
@@ -59,7 +66,7 @@ public class DockerManagerImpl implements DockerManager {
         CreateContainerResponse response = dockerClient
                 .createContainerCmd(imageType.getImageName())
                 .withExposedPorts(exposedPortList)
-                .withHostConfig(HostConfig.newHostConfig().withPortBindings(portBindings).withPublishAllPorts(false))
+                .withHostConfig(hostConfig)
                 .exec();
         String containerId = response.getId().substring(0, 12);
 

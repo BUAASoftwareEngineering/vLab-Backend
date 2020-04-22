@@ -17,7 +17,7 @@ class BackServerApplicationTests {
 
     @Test
     void contextLoads() {
-        dockerManager.createContainer(3, "admin_container", ImageType.JAVA);
+        dockerManager.createContainer(3, "admin_container", ImageType.CPP);
     }
 
 }
