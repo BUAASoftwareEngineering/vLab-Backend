@@ -10,12 +10,14 @@ const wss = new WebSocket.Server({port: 4000});
 const counter = {}
 counter.count = 0
 counter.connect = false
-setTimeout(function() {
+var timer = setInterval(function() {
   // if (counter.connect == false) {
   //   spawnSync('/home/terminal/close.sh')
   // }
-}, 30000)
-
+  if (wss.clients.size == 0) {
+      spawnSync('/home/terminal/close.sh')
+  }
+}, 1800000)
 
 wss.on('listening', function () {
     console.log('[%s]* terminal service init success!', time())
@@ -36,10 +38,11 @@ wss.on('connection', (ws) => {
     env: process.env
   });
   counter.count += 1
-  
     
   ws.on('message', (res) => {
     ptyProcess.write(res)
+    // ptyProcess.write(wss.clients.size)
+    // ws.send(wss.clients.size)
   });
   
   ptyProcess.on('data', function (data) {
@@ -49,10 +52,12 @@ wss.on('connection', (ws) => {
 
   ws.on('close', function(err) {
     counter.count -= 1
-    if (counter.count <= 0) {
-      // console.log('close docker now!!')
-      spawnSync('/home/terminal/close.sh')
-    }
+    setTimeout(function() {
+        if (wss.clients.size == 0) {
+            // console.log('close docker now!!')
+            spawnSync('/home/terminal/close.sh')
+          }
+    }, 30000)
   })
 });
 
@@ -60,3 +65,8 @@ process.on('uncaughtException', function (err) {
   // console.log('close docker now!')
   spawnSync('/home/terminal/close.sh')
 });
+
+process.on('SIGINT', function() {
+    // console.log('I am exit!')
+    process.exit(0)
+})
