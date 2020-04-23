@@ -2,6 +2,7 @@ package org.nocturne.vslab.backserver.manager;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
+import com.github.dockerjava.api.exception.NotModifiedException;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Ports;
@@ -84,18 +85,14 @@ public class DockerManagerImpl implements DockerManager {
     public Boolean startContainer(Integer projectId) {
         Container container = containerMapper.getContainerById(projectId);
 
-        DockerClient dockerClient = DockerClientFactory.getDockerClient(container.getIp());
-        dockerClient.startContainerCmd(container.getContainerId()).exec();
+        try {
+            DockerClient dockerClient = DockerClientFactory.getDockerClient(container.getIp());
+            dockerClient.startContainerCmd(container.getContainerId()).exec();
+        } catch (NotModifiedException ignore) {
+
+        }
 
         Map<Integer, Integer> portMap = getBindingPortsOfContainer(container.getIp(), container.getContainerId());
-        while (portMap.isEmpty()) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            portMap = getBindingPortsOfContainer(container.getIp(), container.getContainerId());
-        }
 
         container.setServerPort(portMap.get(CONTAINER_SERVER_PORT));
         container.setTerminalPort(portMap.get(TERMINAL_PORT));
@@ -108,8 +105,13 @@ public class DockerManagerImpl implements DockerManager {
     @Override
     public Boolean stopContainer(Integer projectId) {
         Container container = containerMapper.getContainerById(projectId);
-        DockerClient dockerClient = DockerClientFactory.getDockerClient(container.getIp());
-        dockerClient.stopContainerCmd(container.getContainerId()).exec();
+
+        try {
+            DockerClient dockerClient = DockerClientFactory.getDockerClient(container.getIp());
+            dockerClient.stopContainerCmd(container.getContainerId()).exec();
+        } catch (NotModifiedException ignore) {
+
+        }
 
         return true;
     }
@@ -130,6 +132,21 @@ public class DockerManagerImpl implements DockerManager {
     }
 
     private Map<Integer, Integer> getBindingPortsOfContainer(String ip, String containerId) {
+        Map<Integer, Integer> result = attemptGetBindingPortsOfContainer(ip, containerId);
+
+        while (result.isEmpty()) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            result = attemptGetBindingPortsOfContainer(ip, containerId);
+        }
+
+        return result;
+    }
+
+    private Map<Integer, Integer> attemptGetBindingPortsOfContainer(String ip, String containerId) {
         Map<Integer, Integer> portMap = new HashMap<>();
 
         try {

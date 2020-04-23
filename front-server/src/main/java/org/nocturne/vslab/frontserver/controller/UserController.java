@@ -33,7 +33,6 @@ public class UserController {
                         @RequestParam(PARAM_USER_NAME) String username,
                         @RequestParam(PARAM_USER_PASSWORD) String password) {
         userService.authorizeUser(username, password);
-        System.out.println("12321");
 
         User user = userService.getUserByName(username);
         setCookie(response, COOKIE_USER_ID, user.getId().toString());
