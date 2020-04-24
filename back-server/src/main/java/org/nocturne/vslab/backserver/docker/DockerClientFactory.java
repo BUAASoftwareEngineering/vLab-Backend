@@ -13,8 +13,8 @@ public class DockerClientFactory {
 
     static {
         configBuilder = DefaultDockerClientConfig.createDefaultConfigBuilder()
-                .withDockerTlsVerify(true)
-                .withDockerCertPath("./certs")
+                .withDockerTlsVerify(false)
+                //.withDockerCertPath("./certs")
                 .withDockerConfig("/home/user/.docker")
                 .withApiVersion("1.30"); // optional
     }

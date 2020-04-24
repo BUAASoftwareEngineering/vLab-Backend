@@ -151,7 +151,7 @@ public class DockerManagerImpl implements DockerManager {
         Map<Integer, Integer> portMap = new HashMap<>();
 
         try {
-            Process process = Runtime.getRuntime().exec(String.format("docker --tlsverify --tlscacert=./certs/ca.pem --tlscert=./certs/cert.pem --tlskey=./certs/key.pem -H tcp://%s:2376 port %s", ip, containerId));
+            Process process = Runtime.getRuntime().exec(String.format("docker -H tcp://%s:2376 port %s", ip, containerId));
             BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
             while ((line = input.readLine()) != null) {
