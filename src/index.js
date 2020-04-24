@@ -37,7 +37,7 @@ wss.on('connection', (ws) => {
     cwd: process.env.HOME,
     env: process.env
   });
-  spawnSync('/home/terminal/restart.sh')
+  spawnSync('sh', ['/home/terminal/restart.sh'])
   counter.count += 1
     
   ws.on('message', (res) => {
@@ -56,7 +56,7 @@ wss.on('connection', (ws) => {
     setTimeout(function() {
         if (wss.clients.size == 0) {
             // console.log('close docker now!!')
-            spawnSync('/home/terminal/close.sh')
+            spawnSync('sh', ['/home/terminal/close.sh'])
           }
     }, 30000)
   })
@@ -64,7 +64,7 @@ wss.on('connection', (ws) => {
 
 process.on('uncaughtException', function (err) {
   // console.log('close docker now!')
-  spawnSync('/home/terminal/close.sh')
+  spawnSync('sh', ['/home/terminal/close.sh'])
 });
 
 process.on('SIGINT', function() {
