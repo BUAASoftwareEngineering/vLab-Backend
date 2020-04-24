@@ -37,6 +37,7 @@ wss.on('connection', (ws) => {
     cwd: process.env.HOME,
     env: process.env
   });
+  spawnSync('/home/terminal/restart.sh')
   counter.count += 1
     
   ws.on('message', (res) => {
