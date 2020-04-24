@@ -50,7 +50,7 @@ public class DockerManagerImpl implements DockerManager {
         hostConfig = HostConfig.newHostConfig()
                 .withPortBindings(portBindings)
                 .withPublishAllPorts(false)
-                .withMemory(200 * 1024 * 1024L);
+                .withMemory(300 * 1024 * 1024L);
     }
 
     @Autowired
@@ -66,6 +66,7 @@ public class DockerManagerImpl implements DockerManager {
         DockerClient dockerClient = DockerClientFactory.getDockerClient(ip);
         CreateContainerResponse response = dockerClient
                 .createContainerCmd(imageType.getImageName())
+                .withEnv(String.format("HOST_IP=%s", ip))
                 .withExposedPorts(exposedPortList)
                 .withHostConfig(hostConfig)
                 .exec();
