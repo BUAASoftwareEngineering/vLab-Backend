@@ -15,7 +15,7 @@ var timer = setInterval(function() {
   //   spawnSync('/home/terminal/close.sh')
   // }
   if (wss.clients.size == 0) {
-      spawnSync('/home/terminal/close.sh')
+      spawnSync('sh', ['/home/terminal/close.sh'])
   }
 }, 1800000)
 
