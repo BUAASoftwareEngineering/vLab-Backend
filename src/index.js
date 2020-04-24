@@ -3,6 +3,7 @@ const os = require('os');
 const WebSocket = require('ws');
 const { time } = require('./date')
 const spawnSync = require('child_process').spawnSync
+const spawn = require('child_process').spawn
 const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
 
 
@@ -37,7 +38,7 @@ wss.on('connection', (ws) => {
     cwd: process.env.HOME,
     env: process.env
   });
-  spawnSync('sh', ['/home/terminal/restart.sh'])
+  spawn('sh', ['/home/terminal/restart.sh'])
   counter.count += 1
     
   ws.on('message', (res) => {
