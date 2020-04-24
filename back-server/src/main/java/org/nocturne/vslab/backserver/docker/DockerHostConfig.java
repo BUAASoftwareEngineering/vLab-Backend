@@ -10,6 +10,7 @@ public class DockerHostConfig {
     static {
         dockerHostIPList = new ArrayList<>();
         dockerHostIPList.add("120.53.27.31");
+        dockerHostIPList.add("154.8.169.190");
         //dockerHostIPList.add("127.0.0.1");
     }
 
