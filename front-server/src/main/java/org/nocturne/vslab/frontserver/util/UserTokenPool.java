@@ -9,9 +9,12 @@ import java.util.concurrent.ConcurrentHashMap;
 public class UserTokenPool {
 
     private ConcurrentHashMap<Integer, String> tokenDistributionData;
+    private ConcurrentHashMap<Integer, Long> timeoutMap;
+    private static final Long EXPIRATION_TIME = 1000L * 60 * 60 * 24;
 
     public UserTokenPool() {
         tokenDistributionData = new ConcurrentHashMap<>();
+        timeoutMap = new ConcurrentHashMap<>();
     }
 
     public synchronized String generateToken(Integer userId) {
@@ -24,6 +27,7 @@ public class UserTokenPool {
         } while (tokenDistributionData.containsValue(token));
 
         tokenDistributionData.put(userId, token);
+        timeoutMap.put(userId, System.currentTimeMillis());
         return token;
     }
 
@@ -31,7 +35,18 @@ public class UserTokenPool {
         if (!tokenDistributionData.containsKey(userId)) {
             return false;
         }
+        if (isExpired(userId)) {
+            return false;
+        }
 
         return tokenDistributionData.get(userId).equals(userToken);
+    }
+
+    private boolean isExpired(Integer userId) {
+        if (!timeoutMap.containsKey(userId)) {
+            return true;
+        }
+
+        return System.currentTimeMillis() - timeoutMap.get(userId) > EXPIRATION_TIME;
     }
 }

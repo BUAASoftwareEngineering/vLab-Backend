@@ -5,6 +5,7 @@ import org.nocturne.vslab.api.entity.Container;
 import org.nocturne.vslab.api.entity.ImageType;
 import org.nocturne.vslab.api.manager.DockerManager;
 import org.nocturne.vslab.frontserver.bean.Result;
+import org.nocturne.vslab.frontserver.exceptiion.project.ProjectCreateLimitException;
 import org.nocturne.vslab.frontserver.mapper.ContainerMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/project")
 public class ProjectController {
+
+    private static final Integer PROJECT_LIMIT = 3;
 
     @Reference(interfaceName = "dockerManager")
     private DockerManager dockerManager;
@@ -39,8 +42,17 @@ public class ProjectController {
                                 @RequestParam(PARAM_PROJECT_NAME) String projectName,
                                 @RequestParam(PARAM_PROJECT_TYPE) String projectType) {
         ImageType imageType = ImageType.valueOf(projectType);
+        checkAmountOfContainer(userId, imageType);
+
         Container container = dockerManager.createContainer(userId, projectName, imageType);
         return new Result(0, "创建成功", container);
+    }
+
+    private void checkAmountOfContainer(Integer userId, ImageType imageType) {
+        List<Container> containerList = containerMapper.getContainersOfUser(userId);
+        if (containerList.stream().map(Container::getImageType).filter(x -> x.equals(imageType)).count() >= PROJECT_LIMIT) {
+            throw new ProjectCreateLimitException();
+        }
     }
 
     @PostMapping("/info_update")
