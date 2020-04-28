@@ -1,12 +1,18 @@
 package org.nocturne.vslab.frontserver.controller;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
 import org.nocturne.vslab.api.entity.Container;
 import org.nocturne.vslab.frontserver.mapper.ContainerMapper;
 import org.nocturne.vslab.frontserver.util.HttpSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +39,7 @@ public class FileController {
         Map<String, String> params = new HashMap<>();
         params.put(PARAM_FILE_ROOT_PATH, rootPath);
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/file/struct", params).get();
+        return new HttpSender(container.getIp(), container.getServerPort(), "/file/struct", params).getForString();
     }
 
     @GetMapping("/content")
@@ -44,7 +50,33 @@ public class FileController {
         Map<String, String> params = new HashMap<>();
         params.put(PARAM_FILE_PATH, filePath);
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/file/content", params).get();
+        return new HttpSender(container.getIp(), container.getServerPort(), "/file/content", params).getForString();
+    }
+
+    @GetMapping("/download")
+    public String downLoadCode(@RequestParam(PARAM_PROJECT_ID) Integer projectId,
+                               HttpServletResponse res) throws IOException, URISyntaxException {
+        Container container = containerMapper.getContainerById(projectId);
+
+        Map<String, String> params = new HashMap<>();
+        HttpResponse received = new HttpSender(container.getIp(), container.getServerPort(), "/file/download", params).getForResponse();
+
+        buildResHeads(received, res);
+        writeContent(received.getEntity().getContent(), res.getOutputStream());
+
+        return "success";
+    }
+
+    private void buildResHeads(HttpResponse received, HttpServletResponse toSend) {
+        for (Header header : received.getAllHeaders()) {
+            toSend.setHeader(header.getName(), header.getValue());
+        }
+    }
+
+    private void writeContent(InputStream inputStream, OutputStream outputStream) throws IOException {
+        IOUtils.copy(inputStream, outputStream);
+        inputStream.close();
+        outputStream.close();
     }
 
     @PostMapping("/update")
@@ -57,7 +89,7 @@ public class FileController {
         params.put(PARAM_FILE_PATH, filePath);
         params.put(PARAM_FILE_CONTENT, fileContent);
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/file/update", params).post();
+        return new HttpSender(container.getIp(), container.getServerPort(), "/file/update", params).postForString();
     }
 
     @PostMapping("/new")
@@ -68,7 +100,7 @@ public class FileController {
         Map<String, String> params = new HashMap<>();
         params.put(PARAM_FILE_PATH, filePath);
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/file/new", params).post();
+        return new HttpSender(container.getIp(), container.getServerPort(), "/file/new", params).postForString();
     }
 
     @PostMapping("/delete")
@@ -79,7 +111,7 @@ public class FileController {
         Map<String, String> params = new HashMap<>();
         params.put(PARAM_FILE_PATH, filePath);
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/file/delete", params).post();
+        return new HttpSender(container.getIp(), container.getServerPort(), "/file/delete", params).postForString();
     }
 
     @PostMapping("/move")
@@ -94,7 +126,7 @@ public class FileController {
         params.put(PARAM_FILE_NEW_PATH, newPath);
         params.put("force", force.toString());
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/file/move", params).post();
+        return new HttpSender(container.getIp(), container.getServerPort(), "/file/move", params).postForString();
     }
 
     @PostMapping("/copy")
@@ -109,7 +141,7 @@ public class FileController {
         params.put(PARAM_FILE_NEW_PATH, newPath);
         params.put("force", force.toString());
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/file/copy", params).post();
+        return new HttpSender(container.getIp(), container.getServerPort(), "/file/copy", params).postForString();
     }
 
     @PostMapping("/rename")
@@ -122,6 +154,6 @@ public class FileController {
         params.put(PARAM_FILE_OLD_PATH, oldPath);
         params.put(PARAM_FILE_NEW_PATH, newPath);
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/file/rename", params).post();
+        return new HttpSender(container.getIp(), container.getServerPort(), "/file/rename", params).postForString();
     }
 }

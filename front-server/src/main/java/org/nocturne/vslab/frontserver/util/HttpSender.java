@@ -1,5 +1,6 @@
 package org.nocturne.vslab.frontserver.util;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -32,7 +33,11 @@ public class HttpSender {
         params.forEach((key, value) -> paramList.add(new BasicNameValuePair(key, value)));
     }
 
-    public String post() throws IOException {
+    public String postForString() throws IOException {
+        return EntityUtils.toString(postForResponse().getEntity(), "UTF-8");
+    }
+
+    public HttpResponse postForResponse() throws IOException {
         CloseableHttpClient httpClient = HttpClients.createDefault();
 
         HttpPost httpPost = new HttpPost(url);
@@ -40,12 +45,14 @@ public class HttpSender {
         httpPost.addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.6)");
         httpPost.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
-        HttpResponse response = httpClient.execute(httpPost);
-
-        return EntityUtils.toString(response.getEntity(), "UTF-8");
+        return httpClient.execute(httpPost);
     }
 
-    public String get() throws URISyntaxException, IOException {
+    public String getForString() throws URISyntaxException, IOException {
+        return EntityUtils.toString(getForResponse().getEntity(), "UTF-8");
+    }
+
+    public HttpResponse getForResponse() throws URISyntaxException, IOException {
         CloseableHttpClient httpClient = HttpClients.createDefault();
 
         URIBuilder uriBuilder = new URIBuilder(url);
@@ -54,8 +61,6 @@ public class HttpSender {
         httpGet.addHeader("User-Agent", "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.7.6)");
         httpGet.addHeader("Content-Type", "application/x-www-form-urlencoded");
 
-        HttpResponse response = httpClient.execute(httpGet);
-
-        return EntityUtils.toString(response.getEntity(), "UTF-8");
+        return httpClient.execute(httpGet);
     }
 }

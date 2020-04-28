@@ -32,7 +32,7 @@ public class DirController {
         Map<String, String> params = new HashMap<>();
         params.put(PARAM_DIR_PATH, dirPath);
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/dir/new", params).post();
+        return new HttpSender(container.getIp(), container.getServerPort(), "/dir/new", params).postForString();
     }
 
     @PostMapping("/delete")
@@ -43,7 +43,7 @@ public class DirController {
         Map<String, String> params = new HashMap<>();
         params.put(PARAM_DIR_PATH, dirPath);
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/dir/delete", params).post();
+        return new HttpSender(container.getIp(), container.getServerPort(), "/dir/delete", params).postForString();
     }
 
     @PostMapping("/move")
@@ -58,7 +58,7 @@ public class DirController {
         params.put(PARAM_DIR_NEW_PATH, newPath);
         params.put("force", force.toString());
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/dir/move", params).post();
+        return new HttpSender(container.getIp(), container.getServerPort(), "/dir/move", params).postForString();
     }
 
     @PostMapping("/copy")
@@ -73,7 +73,7 @@ public class DirController {
         params.put(PARAM_DIR_NEW_PATH, newPath);
         params.put("force", force.toString());
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/dir/copy", params).post();
+        return new HttpSender(container.getIp(), container.getServerPort(), "/dir/copy", params).postForString();
     }
 
     @PostMapping("/rename")
@@ -86,6 +86,6 @@ public class DirController {
         params.put(PARAM_DIR_OLD_PATH, oldPath);
         params.put(PARAM_DIR_NEW_PATH, newPath);
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/dir/rename", params).post();
+        return new HttpSender(container.getIp(), container.getServerPort(), "/dir/rename", params).postForString();
     }
 }
