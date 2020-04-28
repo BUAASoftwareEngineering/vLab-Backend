@@ -2,6 +2,8 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const { time } = require('./date.js')
 const handler = require('./http_handler.js')
+const fs = require('fs')
+const child_process = require('child_process')
 const port = 3000
 
 const app = express()
@@ -30,6 +32,8 @@ app.all('*', function (req, res) {
                 case '/file/content':
                     response = handler.file_content(data)
                     break;
+                case '/file/download':
+                    break;
                 default:
                     response = {
                         code: -100,
@@ -44,8 +48,25 @@ app.all('*', function (req, res) {
         //     response.message = err.message
         //     response.data = {}
         // }
-        console.log('[%s]* response message %s', time(), JSON.stringify(response))
-        res.end(JSON.stringify(response))
+        if (url != '/file/download') {
+            console.log('[%s]* response message %s', time(), JSON.stringify(response))
+            res.end(JSON.stringify(response))
+        } else {
+            try {
+                child_process.execSync('rm /code.zip')
+            } catch (err) {}
+            child_process.execSync('zip -r /code.zip /code')
+            let name = 'code.zip'
+            let path = '/code.zip';
+            var size = fs.statSync(path).size;
+            var f = fs.createReadStream(path);
+            res.writeHead(200, {
+              'Content-Type': 'application/force-download',
+              'Content-Disposition': 'attachment; filename=' + name,
+              'Content-Length': size
+            });
+            f.pipe(res);
+        }
     } else {
         let data = req.body
         console.log('[%s]* receive data from %s', time(), req.headers.origin)
