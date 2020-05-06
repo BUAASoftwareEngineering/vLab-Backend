@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
+import java.util.Objects;
+
 @Service
 public class UserService {
 
@@ -21,7 +23,7 @@ public class UserService {
 
     public User getUserByName(String username) {
         try {
-            return userMapper.getUserByName(username);
+            return Objects.requireNonNull(userMapper.getUserByName(username));
         } catch (Exception e) {
             throw new UserNotFoundException();
         }
@@ -29,7 +31,7 @@ public class UserService {
 
     public User getUserById(Integer id) {
         try {
-            return userMapper.getUserById(id);
+            return Objects.requireNonNull(userMapper.getUserById(id));
         } catch (Exception e) {
             throw new UserNotFoundException();
         }
@@ -53,11 +55,9 @@ public class UserService {
 
     public void authorizeUser(String username, String password) {
         try {
-            User expectedUser = userMapper.getUserByName(username);
+            User expectedUser = Objects.requireNonNull(userMapper.getUserByName(username));
             String encryptedPassword = DigestUtils.md5DigestAsHex(password.getBytes());
 
-            System.out.println(encryptedPassword);
-            System.out.println(expectedUser.getPassword());
             if (!expectedUser.getPassword().equals(encryptedPassword)) {
                 throw new UserAuthFailException();
             }

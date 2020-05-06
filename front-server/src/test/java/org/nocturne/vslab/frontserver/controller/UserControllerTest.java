@@ -17,75 +17,29 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-//@Transactional
+@Transactional
 @WebAppConfiguration
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 class UserControllerTest {
 
-
-    @Autowired
-    private WebApplicationContext wac;
-
-    private MockMvc mockMvc;
-
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+    @Test
+    void login() {
     }
 
     @Test
-    void registerTest() throws Exception {
-        RequestBuilder request = MockMvcRequestBuilders
-                .post("/user/register")
-                .param("user_name", "root")
-                .param("password", "root");
-
-        String content = mockMvc.perform(request)
-                .andReturn().getResponse().getContentAsString(Charsets.UTF_8);
-
-        assertTrue(content.contains("true"));
+    void logout() {
     }
 
     @Test
-    void authTest() throws Exception {
-        RequestBuilder request = MockMvcRequestBuilders
-                .post("/user/auth")
-                .param("user_name", "admin")
-                .param("password", "admin");
-
-        String content = mockMvc.perform(request)
-                .andDo(System.out::println)
-                .andReturn().getResponse().getContentAsString(Charsets.UTF_8);
-
-        assertTrue(content.contains("true"));
+    void register() {
     }
 
     @Test
-    void updateTest() throws Exception {
-        RequestBuilder request = MockMvcRequestBuilders
-                .post("/user/info_update")
-                .param("user_id", "3")
-                .param("user_name", "admin")
-                .param("password", "admin");
-
-        String content = mockMvc.perform(request)
-                .andDo(System.out::println)
-                .andReturn().getResponse().getContentAsString(Charsets.UTF_8);
-
-        assertTrue(content.contains("admin"));
+    void infoUpdate() {
     }
 
     @Test
-    void infoTest() throws Exception {
-        RequestBuilder request = MockMvcRequestBuilders
-                .get("/user/info")
-                .param("user_name", "admin");
-
-        String content = mockMvc.perform(request)
-                .andDo(System.out::println)
-                .andReturn().getResponse().getContentAsString(Charsets.UTF_8);
-
-        assertTrue(content.contains("3"));
+    void info() {
     }
 }
