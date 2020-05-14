@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 
-<mapper namespace="org.nocturne.vslab.frontserver.mapper.ContainerMapper">
+<mapper namespace="org.nocturne.vslab.backend.mapper.ContainerMapper">
 
-    <resultMap id="baseResultMap" type="org.nocturne.vslab.frontserver.bean.Container">
+    <resultMap id="baseResultMap" type="org.nocturne.vslab.backend.bean.Container">
         <id column="project_id" property="projectId"/>
         <result column="type" property="imageType"/>
         <result column="container_id" property="containerId"/>
@@ -48,7 +48,9 @@
         UPDATE tb_container
         SET server_port = #{serverPort},
             terminal_port = #{terminalPort},
-            language_port = #{languagePort}
+            language_port = #{languagePort},
+            container_id = #{containerId},
+            ip = #{ip}
         WHERE project_id = #{projectId};
     </update>
 
