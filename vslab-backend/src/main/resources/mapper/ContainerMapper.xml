@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="org.nocturne.vslab.frontserver.mapper.ContainerMapper">
+
+    <resultMap id="baseResultMap" type="org.nocturne.vslab.frontserver.bean.Container">
+        <id column="project_id" property="projectId"/>
+        <result column="type" property="imageType"/>
+        <result column="container_id" property="containerId"/>
+        <result column="user_id" property="userId"/>
+        <result column="container_name" property="name"/>
+        <result column="ip" property="ip"/>
+        <result column="terminal_port" property="terminalPort"/>
+        <result column="server_port" property="serverPort"/>
+        <result column="language_port" property="languagePort"/>
+    </resultMap>
+
+    <!-- public List<Container> getContainersOfUser(Integer userId);-->
+    <select id="getContainersOfUser" resultMap="baseResultMap">
+        SELECT * FROM tb_container WHERE user_id = #{userId}
+    </select>
+
+    <!-- public void updateContainerName(@Param("projectId") Integer projectId, @Param("projectName") String projectName);-->
+    <update id="updateContainerName">
+        UPDATE tb_container SET container_name = #{projectName} WHERE project_id = #{projectId}
+    </update>
+
+
+    <!-- public Container getContainerById(Integer projectId); -->
+    <select id="getContainerById" resultMap="baseResultMap">
+        SELECT * FROM tb_container WHERE project_id = #{projectId}
+    </select>
+
+
+    <!-- public void createContainer(Container container); -->
+    <insert id="createContainer" useGeneratedKeys="true" keyColumn="id" keyProperty="projectId">
+        INSERT INTO tb_container (type, container_id, container_name, ip, terminal_port, server_port, user_id, language_port)
+        VALUES (#{imageType}, #{containerId}, #{name}, #{ip}, #{terminalPort}, #{serverPort}, #{userId}, #{languagePort})
+    </insert>
+
+    <!-- public void deleteContainer(Integer projectId); -->
+    <delete id="deleteContainer">
+        DELETE FROM tb_container WHERE project_id = #{projectId}
+    </delete>
+
+    <!-- public void updateContainer(Container container); -->
+    <update id="updateContainer">
+        UPDATE tb_container
+        SET server_port = #{serverPort},
+            terminal_port = #{terminalPort},
+            language_port = #{languagePort}
+        WHERE project_id = #{projectId};
+    </update>
+
+</mapper>
