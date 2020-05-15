@@ -1,20 +1,22 @@
 package org.nocturne.vslab.backend.util;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Component
 public class UserTokenPool {
 
-    private ConcurrentHashMap<Integer, String> tokenDistributionData;
-    private ConcurrentHashMap<Integer, Long> timeoutMap;
-    private static final Long EXPIRATION_TIME = 1000L * 60 * 60 * 24;
+    private StringRedisTemplate redisTemplate;
 
-    public UserTokenPool() {
-        tokenDistributionData = new ConcurrentHashMap<>();
-        timeoutMap = new ConcurrentHashMap<>();
+    @Autowired
+    public UserTokenPool(StringRedisTemplate redisTemplate) {
+        this.redisTemplate = redisTemplate;
     }
 
     public synchronized String generateToken(Integer userId) {
@@ -24,29 +26,23 @@ public class UserTokenPool {
         do {
             time = String.valueOf(System.currentTimeMillis());
             token = DigestUtils.md5DigestAsHex(time.getBytes());
-        } while (tokenDistributionData.containsValue(token));
+        } while (isTokenAlreadyInUsed(token));
 
-        tokenDistributionData.put(userId, token);
-        timeoutMap.put(userId, System.currentTimeMillis());
+        redisTemplate.opsForValue().set("token:" + userId, token, 3, TimeUnit.HOURS);
         return token;
     }
 
+    private boolean isTokenAlreadyInUsed(String token) {
+        Set<String> tokenKeys = redisTemplate.keys("token:*");
+        if (tokenKeys == null || tokenKeys.isEmpty()) return false;
+
+        List<String> tokens = redisTemplate.opsForValue().multiGet(tokenKeys);
+        return tokens != null && tokens.contains(token);
+    }
+
     public boolean isUserTokenAccepted(Integer userId, String userToken) {
-        if (!tokenDistributionData.containsKey(userId)) {
-            return false;
-        }
-        if (isExpired(userId)) {
-            return false;
-        }
-
-        return tokenDistributionData.get(userId).equals(userToken);
+        String expectedToken = redisTemplate.opsForValue().get("token:" + userId);
+        return expectedToken != null && expectedToken.equals(userToken);
     }
 
-    private boolean isExpired(Integer userId) {
-        if (!timeoutMap.containsKey(userId)) {
-            return true;
-        }
-
-        return System.currentTimeMillis() - timeoutMap.get(userId) > EXPIRATION_TIME;
-    }
 }

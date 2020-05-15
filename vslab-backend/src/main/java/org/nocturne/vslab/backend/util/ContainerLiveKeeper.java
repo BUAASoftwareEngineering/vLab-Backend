@@ -33,7 +33,6 @@ public class ContainerLiveKeeper {
 
     public void refreshActiveTime(int projectId) {
         lastActiveTime.put(projectId, System.currentTimeMillis());
-        System.out.println(String.format("updated keeper[%d] : %d", projectId, lastActiveTime.get(projectId)));
     }
 
     public void removeKeep(int projectId) {
