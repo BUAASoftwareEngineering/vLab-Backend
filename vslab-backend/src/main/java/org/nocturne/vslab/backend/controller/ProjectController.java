@@ -1,11 +1,11 @@
 package org.nocturne.vslab.backend.controller;
 
-import org.nocturne.vslab.backend.bean.Container;
+import org.nocturne.vslab.backend.bean.Project;
 import org.nocturne.vslab.backend.bean.ImageType;
 import org.nocturne.vslab.backend.manager.DockerManager;
 import org.nocturne.vslab.backend.bean.Result;
 import org.nocturne.vslab.backend.exceptiion.project.ProjectCreateLimitException;
-import org.nocturne.vslab.backend.mapper.ContainerMapper;
+import org.nocturne.vslab.backend.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,19 +21,20 @@ public class ProjectController {
     private static final Integer PROJECT_LIMIT = 3;
 
     private final DockerManager dockerManager;
+    private final ProjectService projectService;
 
-    private final ContainerMapper containerMapper;
 
     @Autowired
-    public ProjectController(ContainerMapper containerMapper, DockerManager dockerManager) {
-        this.containerMapper = containerMapper;
+    public ProjectController(DockerManager dockerManager,
+                             ProjectService projectService) {
         this.dockerManager = dockerManager;
+        this.projectService = projectService;
     }
 
     @GetMapping("/info")
     public Result getAllProjectInfo(@CookieValue(value = PARAM_USER_ID) Integer userId) {
-        List<Container> containerList = containerMapper.getContainersOfUser(userId);
-        return new Result(0, "查询成功", containerList);
+        List<Project> projectList = projectService.getProjectsOfUser(userId);
+        return new Result(0, "查询成功", projectList);
     }
 
     @PostMapping("/new")
@@ -43,13 +44,13 @@ public class ProjectController {
         ImageType imageType = ImageType.valueOf(projectType);
         checkAmountOfContainer(userId, imageType);
 
-        Container container = dockerManager.createContainer(userId, projectName, imageType);
-        return new Result(0, "创建成功", container);
+        Project project = dockerManager.createContainer(userId, projectName, imageType);
+        return new Result(0, "创建成功", project);
     }
 
     private void checkAmountOfContainer(Integer userId, ImageType imageType) {
-        List<Container> containerList = containerMapper.getContainersOfUser(userId);
-        if (containerList.stream().map(Container::getImageType).filter(x -> x.equals(imageType)).count() >= PROJECT_LIMIT) {
+        List<Project> projectList = projectService.getProjectsOfUser(userId);
+        if (projectList.stream().map(Project::getImageType).filter(x -> x.equals(imageType)).count() >= PROJECT_LIMIT) {
             throw new ProjectCreateLimitException();
         }
     }
@@ -57,18 +58,20 @@ public class ProjectController {
     @PostMapping("/info_update")
     public Result updateProjectInfo(@RequestParam(PARAM_PROJECT_ID) Integer projectId,
                                     @RequestParam(PARAM_PROJECT_NAME) String projectName) {
-        containerMapper.updateContainerName(projectId, projectName);
+        Project project = projectService.getProjectById(projectId);
 
-        Container container = containerMapper.getContainerById(projectId);
-        return new Result(0, "更新成功", container);
+        project.setName(projectName);
+        projectService.updateProject(project);
+
+        return new Result(0, "更新成功", project);
     }
 
     @PostMapping("/enter")
     public Result enterProject(@RequestParam(PARAM_PROJECT_ID) Integer projectId) {
         dockerManager.startContainer(projectId);
 
-        Container container = containerMapper.getContainerById(projectId);
-        return new Result(0, "启动成功", container);
+        Project project = projectService.getProjectById(projectId);
+        return new Result(0, "启动成功", project);
     }
 
     @PostMapping("/exit")

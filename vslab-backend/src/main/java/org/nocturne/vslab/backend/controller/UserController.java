@@ -2,7 +2,9 @@ package org.nocturne.vslab.backend.controller;
 
 import org.nocturne.vslab.backend.bean.User;
 import org.nocturne.vslab.backend.bean.Result;
+import org.nocturne.vslab.backend.exceptiion.user.WrongCaptchaException;
 import org.nocturne.vslab.backend.service.UserService;
+import org.nocturne.vslab.backend.util.EmailCaptchaPool;
 import org.nocturne.vslab.backend.util.UserTokenPool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
@@ -20,12 +22,15 @@ public class UserController {
 
     private final UserService userService;
     private final UserTokenPool userTokenPool;
+    private final EmailCaptchaPool captchaPool;
 
     @Autowired
     public UserController(UserService userService,
-                          UserTokenPool userTokenPool) {
+                          UserTokenPool userTokenPool,
+                          EmailCaptchaPool captchaPool) {
         this.userService = userService;
         this.userTokenPool = userTokenPool;
+        this.captchaPool = captchaPool;
     }
 
     @PostMapping("/login")
@@ -52,8 +57,14 @@ public class UserController {
 
     @PostMapping("/register")
     public Result register(@RequestParam(PARAM_USER_NAME) String username,
-                           @RequestParam(PARAM_USER_PASSWORD) String password) {
-        User user = new User(null, username, DigestUtils.md5DigestAsHex(password.getBytes()));
+                           @RequestParam(PARAM_USER_PASSWORD) String password,
+                           @RequestParam(PARAM_USER_EMAIL) String email,
+                           @RequestParam("captcha") String captcha) {
+        if (!captchaPool.isCaptchaAccepted(email, captcha)) {
+            throw new WrongCaptchaException();
+        }
+
+        User user = new User(null, username, DigestUtils.md5DigestAsHex(password.getBytes()), email);
         userService.createUser(user);
 
         return new Result(0, "注册成功", null);
@@ -64,7 +75,7 @@ public class UserController {
                              @CookieValue(PARAM_USER_ID) Integer userId,
                              @RequestParam(value = PARAM_USER_NAME, required = false) String username,
                              @RequestParam(value = PARAM_USER_PASSWORD, required = false) String password) {
-        User user = new User(userId, username, password == null ? null : DigestUtils.md5DigestAsHex(password.getBytes()));
+        User user = new User(userId, username, password == null ? null : DigestUtils.md5DigestAsHex(password.getBytes()), null);
         userService.updateUser(user);
 
         setCookie(response, COOKIE_USER_NAME, user.getName());

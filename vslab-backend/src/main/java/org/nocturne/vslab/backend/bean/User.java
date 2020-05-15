@@ -18,4 +18,6 @@ public class User implements Serializable {
      * 注意该字段为密码加密后的密文
      */
     private String password;
+
+    private String email;
 }

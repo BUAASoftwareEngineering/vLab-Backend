@@ -7,11 +7,12 @@
         <id column="id" property="id"/>
         <result column="name" property="name"/>
         <result column="password" property="password"/>
+        <result column="email" property="email"/>
     </resultMap>
 
     <!--public void createUser(User user);-->
     <insert id="createUser" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO tb_user (name, password) VALUES (#{name}, #{password})
+        INSERT INTO tb_user (name, password, email) VALUES (#{name}, #{password}, #{email})
     </insert>
 
     <!-- public User getUserByName(String username);-->
@@ -22,6 +23,11 @@
     <!--public User getUserById(Integer id);-->
     <select id="getUserById" resultMap="baseResultMap">
         SELECT * FROM tb_user WHERE id = #{id}
+    </select>
+
+    <!--public User getUserByEmail(String email);-->
+    <select id="getUserByEmail" resultMap="baseResultMap">
+        SELECT * FROM tb_user WHERE email = #{email}
     </select>
 
     <!--public void deleteUserByName(String username);-->

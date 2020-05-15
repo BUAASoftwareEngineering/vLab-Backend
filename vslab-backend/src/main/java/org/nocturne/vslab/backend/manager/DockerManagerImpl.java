@@ -5,11 +5,11 @@ import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.Ports;
-import org.nocturne.vslab.backend.bean.Container;
+import org.nocturne.vslab.backend.bean.Project;
 import org.nocturne.vslab.backend.bean.ImageType;
 import org.nocturne.vslab.backend.docker.DockerClientFactory;
 import org.nocturne.vslab.backend.docker.DockerHostConfig;
-import org.nocturne.vslab.backend.mapper.ContainerMapper;
+import org.nocturne.vslab.backend.mapper.ProjectMapper;
 import org.nocturne.vslab.backend.util.ContainerLiveKeeper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -32,7 +32,7 @@ public class DockerManagerImpl implements DockerManager {
     private static final Integer LANGUAGE_PORT = 5000;
 
     private final ContainerLiveKeeper keeper;
-    private final ContainerMapper containerMapper;
+    private final ProjectMapper projectMapper;
 
     private static final List<ExposedPort> exposedPortList = new ArrayList<>();
     private static final HostConfig hostConfig;
@@ -59,9 +59,9 @@ public class DockerManagerImpl implements DockerManager {
 
     @Lazy
     @Autowired
-    public DockerManagerImpl(ContainerMapper containerMapper,
+    public DockerManagerImpl(ProjectMapper projectMapper,
                              ContainerLiveKeeper keeper) {
-        this.containerMapper = containerMapper;
+        this.projectMapper = projectMapper;
         this.keeper = keeper;
     }
 
@@ -70,13 +70,13 @@ public class DockerManagerImpl implements DockerManager {
      */
     @Transactional
     @Override
-    public Container createContainer(Integer userId, String containerName, ImageType imageType) {
-        Container container = new Container(null, "null", userId,
+    public Project createContainer(Integer userId, String containerName, ImageType imageType) {
+        Project project = new Project(null, "null", userId,
                 imageType, containerName,
                 "null", 0, 0, 0);
-        containerMapper.createContainer(container);
+        projectMapper.createProject(project);
 
-        return container;
+        return project;
     }
 
     /**
@@ -91,15 +91,15 @@ public class DockerManagerImpl implements DockerManager {
     @Transactional
     @Override
     public Boolean startContainer(Integer projectId) {
-        Container container = containerMapper.getContainerById(projectId);
-        if (!"null".equals(container.getIp())) return true;
+        Project project = projectMapper.getProjectById(projectId);
+        if (!"null".equals(project.getIp())) return true;
 
         // create and run container on randomly chosen host
         String ip = DockerHostConfig.getIPRandomly();
 
         DockerClient dockerClient = DockerClientFactory.getDockerClient(ip);
         CreateContainerResponse response = dockerClient
-                .createContainerCmd(container.getImageType().getImageName())
+                .createContainerCmd(project.getImageType().getImageName())
                 .withEnv(String.format("HOST_IP=%s", ip))
                 .withExposedPorts(exposedPortList)
                 .withHostConfig(hostConfig)
@@ -110,14 +110,14 @@ public class DockerManagerImpl implements DockerManager {
 
         // update container info to db
         Map<Integer, Integer> portMap = getBindingPortsOfContainer(ip, containerId);
-        container.setServerPort(portMap.get(CONTAINER_SERVER_PORT));
-        container.setTerminalPort(portMap.get(TERMINAL_PORT));
-        container.setLanguagePort(portMap.get(LANGUAGE_PORT));
+        project.setServerPort(portMap.get(CONTAINER_SERVER_PORT));
+        project.setTerminalPort(portMap.get(TERMINAL_PORT));
+        project.setLanguagePort(portMap.get(LANGUAGE_PORT));
 
-        container.setIp(ip);
-        container.setContainerId(containerId);
+        project.setIp(ip);
+        project.setContainerId(containerId);
 
-        containerMapper.updateContainer(container);
+        projectMapper.updateProject(project);
 
         // start keeper to monitor container alive
         keeper.refreshActiveTime(projectId);
@@ -132,20 +132,20 @@ public class DockerManagerImpl implements DockerManager {
      */
     @Override
     public Boolean stopContainer(Integer projectId) {
-        Container container = containerMapper.getContainerById(projectId);
-        if ("null".equals(container.getIp())) return true;
+        Project project = projectMapper.getProjectById(projectId);
+        if ("null".equals(project.getIp())) return true;
 
         // remove special container
-        DockerClient dockerClient = DockerClientFactory.getDockerClient(container.getIp());
-        dockerClient.removeContainerCmd(container.getContainerId()).withForce(true).exec();
+        DockerClient dockerClient = DockerClientFactory.getDockerClient(project.getIp());
+        dockerClient.removeContainerCmd(project.getContainerId()).withForce(true).exec();
 
         // stop keeper which is monitoring it
         keeper.removeKeep(projectId);
 
         // reset record of the container in db
-        container.setIp("null");
-        container.setContainerId("null");
-        containerMapper.updateContainer(container);
+        project.setIp("null");
+        project.setContainerId("null");
+        projectMapper.updateProject(project);
 
         return true;
     }
@@ -161,7 +161,7 @@ public class DockerManagerImpl implements DockerManager {
         stopContainer(projectId);
 
         // remove record of the container in db
-        containerMapper.deleteContainer(projectId);
+        projectMapper.deleteProject(projectId);
 
         return true;
     }

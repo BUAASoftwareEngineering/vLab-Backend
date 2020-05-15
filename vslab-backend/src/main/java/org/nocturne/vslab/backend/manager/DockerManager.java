@@ -1,11 +1,11 @@
 package org.nocturne.vslab.backend.manager;
 
-import org.nocturne.vslab.backend.bean.Container;
+import org.nocturne.vslab.backend.bean.Project;
 import org.nocturne.vslab.backend.bean.ImageType;
 
 public interface DockerManager {
 
-    public Container createContainer(Integer userId, String containerName, ImageType imageType);
+    public Project createContainer(Integer userId, String containerName, ImageType imageType);
 
     /**
      * 根据Id销毁container

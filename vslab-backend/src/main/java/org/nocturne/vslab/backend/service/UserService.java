@@ -3,7 +3,7 @@ package org.nocturne.vslab.backend.service;
 import org.nocturne.vslab.backend.bean.User;
 import org.nocturne.vslab.backend.exceptiion.user.UserAuthFailException;
 import org.nocturne.vslab.backend.exceptiion.user.UserNotFoundException;
-import org.nocturne.vslab.backend.exceptiion.user.UsernameAlreadyExist;
+import org.nocturne.vslab.backend.exceptiion.user.UserAlreadyExist;
 import org.nocturne.vslab.backend.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,7 +41,7 @@ public class UserService {
         try {
             userMapper.createUser(user);
         } catch (Exception e) {
-            throw new UsernameAlreadyExist();
+            throw new UserAlreadyExist();
         }
     }
 
@@ -49,7 +49,7 @@ public class UserService {
         try {
             userMapper.updateUser(user);
         } catch (Exception e) {
-            throw new UsernameAlreadyExist();
+            throw new UserAlreadyExist();
         }
     }
 

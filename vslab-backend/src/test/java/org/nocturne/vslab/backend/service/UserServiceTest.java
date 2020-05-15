@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.nocturne.vslab.backend.bean.User;
 import org.nocturne.vslab.backend.exceptiion.user.UserAuthFailException;
 import org.nocturne.vslab.backend.exceptiion.user.UserNotFoundException;
-import org.nocturne.vslab.backend.exceptiion.user.UsernameAlreadyExist;
+import org.nocturne.vslab.backend.exceptiion.user.UserAlreadyExist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -60,7 +60,7 @@ class UserServiceTest {
 
     @Test
     void createUserDupName() {
-        assertThrows(UsernameAlreadyExist.class, () -> {
+        assertThrows(UserAlreadyExist.class, () -> {
             User user = new User(null, "admin", "admin");
             userService.createUser(user);
         });
@@ -77,7 +77,7 @@ class UserServiceTest {
 
     @Test
     void updateUserDupName() {
-        assertThrows(UsernameAlreadyExist.class, () -> {
+        assertThrows(UserAlreadyExist.class, () -> {
             User user = new User(57, "admin1", "test");
             userService.updateUser(user);
         });

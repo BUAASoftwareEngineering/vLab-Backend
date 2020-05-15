@@ -4,10 +4,11 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.nocturne.vslab.backend.bean.Container;
+import org.nocturne.vslab.backend.bean.Project;
 import org.nocturne.vslab.backend.bean.Result;
 import org.nocturne.vslab.backend.exceptiion.project.ProjectNotFoundException;
-import org.nocturne.vslab.backend.mapper.ContainerMapper;
+import org.nocturne.vslab.backend.mapper.ProjectMapper;
+import org.nocturne.vslab.backend.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Objects;
 
 @Aspect
@@ -23,11 +25,12 @@ import java.util.Objects;
 @Component
 public class ProjectAuthorizeAspect {
 
-    private ContainerMapper containerMapper;
+    private final ProjectService projectService;
 
     @Autowired
-    public ProjectAuthorizeAspect(ContainerMapper containerMapper) {
-        this.containerMapper = containerMapper;
+    public ProjectAuthorizeAspect(ProjectMapper projectMapper,
+                                  ProjectService projectService) {
+        this.projectService = projectService;
     }
 
     @Pointcut("execution(public * org.nocturne.vslab.backend.controller.ProjectController.enterProject(..)) ||" +
@@ -56,12 +59,8 @@ public class ProjectAuthorizeAspect {
         Integer projectId = (Integer) joinPoint.getArgs()[0];
         Integer userId = getRequestUserId();
 
-        try {
-            Container container = containerMapper.getContainerById(projectId);
-            if (!container.getUserId().equals(userId)) {
-                throw new ProjectNotFoundException();
-            }
-        } catch (Exception e) {
+        List<Project> projects = projectService.getProjectsOfUser(userId);
+        if (projects.stream().map(Project::getProjectId).noneMatch(x -> x.equals(projectId))) {
             throw new ProjectNotFoundException();
         }
     }

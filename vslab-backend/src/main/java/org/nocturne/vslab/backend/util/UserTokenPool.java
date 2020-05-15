@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class UserTokenPool {
 
-    private StringRedisTemplate redisTemplate;
+    private final StringRedisTemplate redisTemplate;
 
     @Autowired
     public UserTokenPool(StringRedisTemplate redisTemplate) {

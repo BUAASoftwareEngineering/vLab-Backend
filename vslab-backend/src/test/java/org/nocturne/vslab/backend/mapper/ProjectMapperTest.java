@@ -3,7 +3,7 @@ package org.nocturne.vslab.backend.mapper;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.nocturne.vslab.backend.bean.Container;
+import org.nocturne.vslab.backend.bean.Project;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -18,30 +18,30 @@ import static org.junit.jupiter.api.Assertions.*;
 @WebAppConfiguration
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-class ContainerMapperTest {
+class ProjectMapperTest {
 
     @Autowired
-    public ContainerMapper containerMapper;
+    public ProjectMapper projectMapper;
 
     @Test
     public void getContainersOfUser() {
-        List<Container> list = containerMapper.getContainersOfUser(57);
+        List<Project> list = projectMapper.getProjectsOfUser(57);
         assertFalse(list.isEmpty());
     }
 
     @Test
     public void getContainerById() {
-        Container container = containerMapper.getContainerById(314);
-        assertNotNull(container);
+        Project project = projectMapper.getProjectById(314);
+        assertNotNull(project);
     }
 
     @Test
     public void updateContainerName() {
-        Container container = containerMapper.getContainerById(314);
-        assertNotEquals("new", container.getName());
-        containerMapper.updateContainerName(314, "new");
+        Project project = projectMapper.getProjectById(314);
+        assertNotEquals("new", project.getName());
+        projectMapper.updateProjectName(314, "new");
 
-        container = containerMapper.getContainerById(314);
-        assertEquals("new", container.getName());
+        project = projectMapper.getProjectById(314);
+        assertEquals("new", project.getName());
     }
 }

@@ -3,8 +3,9 @@ package org.nocturne.vslab.backend.controller;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
-import org.nocturne.vslab.backend.bean.Container;
-import org.nocturne.vslab.backend.mapper.ContainerMapper;
+import org.nocturne.vslab.backend.bean.Project;
+import org.nocturne.vslab.backend.mapper.ProjectMapper;
+import org.nocturne.vslab.backend.service.ProjectService;
 import org.nocturne.vslab.backend.util.HttpSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -24,42 +25,42 @@ import static org.nocturne.vslab.backend.config.StringConst.*;
 @RequestMapping("/file")
 public class FileController {
 
-    private ContainerMapper containerMapper;
+    private final ProjectService projectService;
 
     @Autowired
-    public FileController(ContainerMapper containerMapper) {
-        this.containerMapper = containerMapper;
+    public FileController(ProjectService projectService) {
+        this.projectService = projectService;
     }
 
     @GetMapping("/struct")
     public String getFileStruct(@RequestParam(PARAM_PROJECT_ID) Integer projectId,
                                 @RequestParam(PARAM_FILE_ROOT_PATH) String rootPath) throws IOException, URISyntaxException {
-        Container container = containerMapper.getContainerById(projectId);
+        Project project = projectService.getProjectById(projectId);
 
         Map<String, String> params = new HashMap<>();
         params.put(PARAM_FILE_ROOT_PATH, rootPath);
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/file/struct", params).getForString();
+        return new HttpSender(project.getIp(), project.getServerPort(), "/file/struct", params).getForString();
     }
 
     @GetMapping("/content")
     public String getFileContent(@RequestParam(PARAM_PROJECT_ID) Integer projectId,
                                  @RequestParam(PARAM_FILE_PATH) String filePath) throws IOException, URISyntaxException {
-        Container container = containerMapper.getContainerById(projectId);
+        Project project = projectService.getProjectById(projectId);
 
         Map<String, String> params = new HashMap<>();
         params.put(PARAM_FILE_PATH, filePath);
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/file/content", params).getForString();
+        return new HttpSender(project.getIp(), project.getServerPort(), "/file/content", params).getForString();
     }
 
     @GetMapping("/download")
     public String downLoadCode(@RequestParam(PARAM_PROJECT_ID) Integer projectId,
                                HttpServletResponse res) throws IOException, URISyntaxException {
-        Container container = containerMapper.getContainerById(projectId);
+        Project project = projectService.getProjectById(projectId);
 
         Map<String, String> params = new HashMap<>();
-        HttpResponse received = new HttpSender(container.getIp(), container.getServerPort(), "/file/download", params).getForResponse();
+        HttpResponse received = new HttpSender(project.getIp(), project.getServerPort(), "/file/download", params).getForResponse();
 
         buildResHeads(received, res);
         writeContent(received.getEntity().getContent(), res.getOutputStream());
@@ -83,35 +84,35 @@ public class FileController {
     public String updateFileContent(@RequestParam(PARAM_PROJECT_ID) Integer projectId,
                                     @RequestParam(PARAM_FILE_PATH) String filePath,
                                     @RequestParam(PARAM_FILE_CONTENT) String fileContent) throws IOException {
-        Container container = containerMapper.getContainerById(projectId);
+        Project project = projectService.getProjectById(projectId);
 
         Map<String, String> params = new HashMap<>();
         params.put(PARAM_FILE_PATH, filePath);
         params.put(PARAM_FILE_CONTENT, fileContent);
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/file/update", params).postForString();
+        return new HttpSender(project.getIp(), project.getServerPort(), "/file/update", params).postForString();
     }
 
     @PostMapping("/new")
     public String createFile(@RequestParam(PARAM_PROJECT_ID) Integer projectId,
                              @RequestParam(PARAM_FILE_PATH) String filePath) throws IOException {
-        Container container = containerMapper.getContainerById(projectId);
+        Project project = projectService.getProjectById(projectId);
 
         Map<String, String> params = new HashMap<>();
         params.put(PARAM_FILE_PATH, filePath);
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/file/new", params).postForString();
+        return new HttpSender(project.getIp(), project.getServerPort(), "/file/new", params).postForString();
     }
 
     @PostMapping("/delete")
     public String deleteFile(@RequestParam(PARAM_PROJECT_ID) Integer projectId,
                              @RequestParam(PARAM_FILE_PATH) String filePath) throws IOException {
-        Container container = containerMapper.getContainerById(projectId);
+        Project project = projectService.getProjectById(projectId);
 
         Map<String, String> params = new HashMap<>();
         params.put(PARAM_FILE_PATH, filePath);
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/file/delete", params).postForString();
+        return new HttpSender(project.getIp(), project.getServerPort(), "/file/delete", params).postForString();
     }
 
     @PostMapping("/move")
@@ -119,14 +120,14 @@ public class FileController {
                            @RequestParam(PARAM_FILE_OLD_PATH) String oldPath,
                            @RequestParam(PARAM_FILE_NEW_PATH) String newPath,
                            @RequestParam(value = "force", defaultValue = "false") Boolean force) throws IOException {
-        Container container = containerMapper.getContainerById(projectId);
+        Project project = projectService.getProjectById(projectId);
 
         Map<String, String> params = new HashMap<>();
         params.put(PARAM_FILE_OLD_PATH, oldPath);
         params.put(PARAM_FILE_NEW_PATH, newPath);
         params.put("force", force.toString());
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/file/move", params).postForString();
+        return new HttpSender(project.getIp(), project.getServerPort(), "/file/move", params).postForString();
     }
 
     @PostMapping("/copy")
@@ -134,26 +135,26 @@ public class FileController {
                            @RequestParam(PARAM_FILE_OLD_PATH) String oldPath,
                            @RequestParam(PARAM_FILE_NEW_PATH) String newPath,
                            @RequestParam(value = "force", defaultValue = "false") Boolean force) throws IOException {
-        Container container = containerMapper.getContainerById(projectId);
+        Project project = projectService.getProjectById(projectId);
 
         Map<String, String> params = new HashMap<>();
         params.put(PARAM_FILE_OLD_PATH, oldPath);
         params.put(PARAM_FILE_NEW_PATH, newPath);
         params.put("force", force.toString());
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/file/copy", params).postForString();
+        return new HttpSender(project.getIp(), project.getServerPort(), "/file/copy", params).postForString();
     }
 
     @PostMapping("/rename")
     public String renameFile(@RequestParam(PARAM_PROJECT_ID) Integer projectId,
                              @RequestParam(PARAM_FILE_OLD_PATH) String oldPath,
                              @RequestParam(PARAM_FILE_NEW_PATH) String newPath) throws IOException {
-        Container container = containerMapper.getContainerById(projectId);
+        Project project = projectService.getProjectById(projectId);
 
         Map<String, String> params = new HashMap<>();
         params.put(PARAM_FILE_OLD_PATH, oldPath);
         params.put(PARAM_FILE_NEW_PATH, newPath);
 
-        return new HttpSender(container.getIp(), container.getServerPort(), "/file/rename", params).postForString();
+        return new HttpSender(project.getIp(), project.getServerPort(), "/file/rename", params).postForString();
     }
 }

@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Container implements Serializable {
+public class Project implements Serializable {
     /**
      * 数据库中的id字段，唯一标识container
      */
@@ -20,8 +20,6 @@ public class Container implements Serializable {
      */
     private String containerId;
 
-    private Integer userId;
-
     private ImageType imageType;
 
     private String name;
@@ -31,8 +29,4 @@ public class Container implements Serializable {
     private Integer serverPort;
     private Integer terminalPort;
     private Integer languagePort;
-
-    public static String getActualContainerName(String name, Integer projectId) {
-        return String.format("%s_%d", name, projectId);
-    }
 }

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="org.nocturne.vslab.backend.mapper.ProjectMapper">
+
+    <resultMap id="baseResultMap" type="org.nocturne.vslab.backend.bean.Project">
+        <id column="project_id" property="projectId"/>
+        <result column="type" property="imageType"/>
+        <result column="container_id" property="containerId"/>
+        <result column="project_name" property="name"/>
+        <result column="ip" property="ip"/>
+        <result column="terminal_port" property="terminalPort"/>
+        <result column="server_port" property="serverPort"/>
+        <result column="language_port" property="languagePort"/>
+    </resultMap>
+
+    <!-- public List<Project> getProjectsOfUser(Integer userId); -->
+    <select id="getProjectsOfUser" resultMap="baseResultMap">
+        SELECT type, container_id, project_name, ip, terminal_port, server_port, tb_project.project_id, language_port
+        FROM tb_project, tb_user_project
+        WHERE tb_user_project.project_id = tb_project.project_id AND user_id = #{userId}
+    </select>
+
+    <!-- public void updateProjectName(@Param("projectId") Integer projectId, @Param("projectName") String projectName); -->
+    <update id="updateProjectName">
+        UPDATE tb_project
+        SET project_name = #{projectName}
+        WHERE project_id = #{projectId}
+    </update>
+
+    <!-- public Project getProjectById(Integer projectId); -->
+    <select id="getProjectById" resultMap="baseResultMap">
+        SELECT *
+        FROM tb_project
+        WHERE project_id = #{projectId}
+    </select>
+
+    <!-- public void createProject(Project project); -->
+    <insert id="createProject" useGeneratedKeys="true" keyColumn="project_id" keyProperty="projectId">
+        INSERT INTO tb_project (type, container_id, project_name, ip, terminal_port, server_port, language_port)
+        VALUES (#{imageType}, #{containerId}, #{name}, #{ip}, #{terminalPort}, #{serverPort}, #{languagePort})
+    </insert>
+
+    <!-- public void deleteProject(Integer projectId); -->
+    <delete id="deleteProject">
+        DELETE FROM tb_project
+        WHERE project_id = #{projectId}
+    </delete>
+
+    <!-- public void updateProject(Project project); -->
+    <update id="updateProject">
+        UPDATE tb_project
+        SET project_name = #{name},
+            ip = #{ip},
+            server_port = #{serverPort},
+            terminal_port = #{terminalPort},
+            language_port = #{languagePort},
+            container_id = #{containerId}
+        WHERE project_id = #{projectId};
+    </update>
+
+</mapper>

@@ -10,6 +10,8 @@ public interface UserMapper {
 
     public User getUserById(Integer id);
 
+    public User getUserByEmail(String email);
+
     public void createUser(User user);
 
     public void deleteUserByName(String username);
