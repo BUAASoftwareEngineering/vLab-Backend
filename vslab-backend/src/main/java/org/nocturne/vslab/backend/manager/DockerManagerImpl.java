@@ -70,9 +70,9 @@ public class DockerManagerImpl implements DockerManager {
      */
     @Transactional
     @Override
-    public Project createContainer(Integer userId, String containerName, ImageType imageType) {
-        Project project = new Project(null, "null", userId,
-                imageType, containerName,
+    public Project createContainer(Integer userId, String projectName, ImageType imageType) {
+        Project project = new Project(null, "null",
+                imageType, projectName,
                 "null", 0, 0, 0);
         projectMapper.createProject(project);
 

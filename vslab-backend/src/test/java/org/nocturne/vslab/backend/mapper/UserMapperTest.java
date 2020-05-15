@@ -39,7 +39,7 @@ class UserMapperTest {
 
     @Test
     void createUser() {
-        userMapper.createUser(new User(null, "nulllllllllll", "nulllllllllll"));
+        userMapper.createUser(new User(null, "nulllllllllll", "nulllllllllll", null));
         assertNotNull(userMapper.getUserByName("nulllllllllll"));
     }
 

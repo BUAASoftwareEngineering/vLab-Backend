@@ -51,7 +51,7 @@ class UserServiceTest {
 
     @Test
     void createUserNotDupName() {
-        User user = new User(null, "nullllllllllllll", "nulllllllllll");
+        User user = new User(null, "nullllllllllllll", "nulllllllllll", "nullllllllll");
         userService.createUser(user);
 
         user = userService.getUserByName("nullllllllllllll");
@@ -61,14 +61,14 @@ class UserServiceTest {
     @Test
     void createUserDupName() {
         assertThrows(UserAlreadyExist.class, () -> {
-            User user = new User(null, "admin", "admin");
+            User user = new User(null, "admin", "admin","nullllllllll");
             userService.createUser(user);
         });
     }
 
     @Test
     void updateUserNotDupName() {
-        User user = new User(57, "admin2", "test");
+        User user = new User(57, "admin2", "test", "nulllllllllllllll");
         userService.updateUser(user);
 
         User admin2 = userService.getUserByName("admin2");
@@ -78,7 +78,7 @@ class UserServiceTest {
     @Test
     void updateUserDupName() {
         assertThrows(UserAlreadyExist.class, () -> {
-            User user = new User(57, "admin1", "test");
+            User user = new User(57, "admin1", "test", "nullllllllllll");
             userService.updateUser(user);
         });
     }
