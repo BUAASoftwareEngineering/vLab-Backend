@@ -33,7 +33,7 @@ wss.on('connection', (ws) => {
   counter.connect = true
   const ptyProcess = pty.spawn(shell, [], {
     name: 'xterm-color',
-    cols: 150,
+    cols: 500,
     rows: 100,
     cwd: process.env.HOME,
     env: process.env
