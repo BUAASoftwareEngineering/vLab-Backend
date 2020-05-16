@@ -8,6 +8,7 @@ import org.nocturne.vslab.backend.mapper.UserProjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -41,6 +42,7 @@ public class ProjectService {
         return project;
     }
 
+    @Transactional
     public void createProject(Integer userId, Project project) {
         projectMapper.createProject(project);
         userProjectMapper.bindProjectToUser(userId, project.getProjectId());
@@ -62,6 +64,7 @@ public class ProjectService {
         unbindProjectFromUser(userId, project.getProjectId());
     }
 
+    @Transactional
     public void unbindProjectFromUser(Integer userId, Integer projectId) {
         userProjectMapper.unbindProjectFromUser(userId, projectId);
 
