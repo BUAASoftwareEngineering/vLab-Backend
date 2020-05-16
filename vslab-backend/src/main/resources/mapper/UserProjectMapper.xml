@@ -15,7 +15,7 @@
     </delete>
 
     <!-- public List<Integer> getHoldersOfProjects(Integer projectId); -->
-    <select id="getHoldersOfProjects">
+    <select id="getHoldersOfProjects" resultType="Integer">
         SELECT user_id
         FROM tb_user_project
         WHERE project_id = #{projectId}
