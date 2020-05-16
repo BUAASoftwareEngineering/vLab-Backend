@@ -82,8 +82,9 @@ public class ProjectController {
     }
 
     @PostMapping("/delete")
-    public Result destroyProject(@RequestParam(PARAM_PROJECT_ID) Integer projectId) {
-        dockerManager.destroyContainer(projectId);
+    public Result destroyProject(@RequestParam(PARAM_PROJECT_ID) Integer projectId,
+                                 @CookieValue(value = PARAM_USER_ID) Integer userId) {
+        dockerManager.destroyContainer(userId, projectId);
 
         return new Result(0, "删除成功", null);
     }

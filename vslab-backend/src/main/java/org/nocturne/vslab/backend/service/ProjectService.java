@@ -2,9 +2,11 @@ package org.nocturne.vslab.backend.service;
 
 import org.nocturne.vslab.backend.bean.Project;
 import org.nocturne.vslab.backend.exceptiion.project.ProjectNotFoundException;
+import org.nocturne.vslab.backend.manager.DockerManager;
 import org.nocturne.vslab.backend.mapper.ProjectMapper;
 import org.nocturne.vslab.backend.mapper.UserProjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,12 +16,16 @@ public class ProjectService {
 
     private final ProjectMapper projectMapper;
     private final UserProjectMapper userProjectMapper;
+    private final DockerManager dockerManager;
 
+    @Lazy
     @Autowired
     public ProjectService(ProjectMapper projectMapper,
-                          UserProjectMapper userProjectMapper) {
+                          UserProjectMapper userProjectMapper,
+                          DockerManager dockerManager) {
         this.projectMapper = projectMapper;
         this.userProjectMapper = userProjectMapper;
+        this.dockerManager = dockerManager;
     }
 
     public List<Project> getProjectsOfUser(Integer userId) {
@@ -60,8 +66,9 @@ public class ProjectService {
         userProjectMapper.unbindProjectFromUser(userId, projectId);
 
         List<Integer> holders = userProjectMapper.getHoldersOfProjects(projectId);
-        if (holders.isEmpty()) projectMapper.deleteProject(projectId);
+        if (holders.isEmpty()) {
+            dockerManager.stopContainer(projectId);
+            projectMapper.deleteProject(projectId);
+        }
     }
-
-
 }

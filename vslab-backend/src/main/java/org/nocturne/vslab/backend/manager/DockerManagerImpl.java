@@ -9,7 +9,7 @@ import org.nocturne.vslab.backend.bean.Project;
 import org.nocturne.vslab.backend.bean.ImageType;
 import org.nocturne.vslab.backend.docker.DockerClientFactory;
 import org.nocturne.vslab.backend.docker.DockerHostConfig;
-import org.nocturne.vslab.backend.mapper.ProjectMapper;
+import org.nocturne.vslab.backend.service.ProjectService;
 import org.nocturne.vslab.backend.util.ContainerLiveKeeper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -32,7 +32,8 @@ public class DockerManagerImpl implements DockerManager {
     private static final Integer LANGUAGE_PORT = 5000;
 
     private final ContainerLiveKeeper keeper;
-    private final ProjectMapper projectMapper;
+
+    private final ProjectService projectService;
 
     private static final List<ExposedPort> exposedPortList = new ArrayList<>();
     private static final HostConfig hostConfig;
@@ -59,10 +60,10 @@ public class DockerManagerImpl implements DockerManager {
 
     @Lazy
     @Autowired
-    public DockerManagerImpl(ProjectMapper projectMapper,
-                             ContainerLiveKeeper keeper) {
-        this.projectMapper = projectMapper;
+    public DockerManagerImpl(ContainerLiveKeeper keeper,
+                             ProjectService projectService) {
         this.keeper = keeper;
+        this.projectService = projectService;
     }
 
     /**
@@ -74,7 +75,7 @@ public class DockerManagerImpl implements DockerManager {
         Project project = new Project(null, "null",
                 imageType, projectName,
                 "null", 0, 0, 0);
-        projectMapper.createProject(project);
+        projectService.createProject(userId, project);
 
         return project;
     }
@@ -91,7 +92,7 @@ public class DockerManagerImpl implements DockerManager {
     @Transactional
     @Override
     public Boolean startContainer(Integer projectId) {
-        Project project = projectMapper.getProjectById(projectId);
+        Project project = projectService.getProjectById(projectId);
         if (!"null".equals(project.getIp())) return true;
 
         // create and run container on randomly chosen host
@@ -117,7 +118,7 @@ public class DockerManagerImpl implements DockerManager {
         project.setIp(ip);
         project.setContainerId(containerId);
 
-        projectMapper.updateProject(project);
+        projectService.updateProject(project);
 
         // start keeper to monitor container alive
         keeper.refreshActiveTime(projectId);
@@ -132,7 +133,7 @@ public class DockerManagerImpl implements DockerManager {
      */
     @Override
     public Boolean stopContainer(Integer projectId) {
-        Project project = projectMapper.getProjectById(projectId);
+        Project project = projectService.getProjectById(projectId);
         if ("null".equals(project.getIp())) return true;
 
         // remove special container
@@ -145,23 +146,19 @@ public class DockerManagerImpl implements DockerManager {
         // reset record of the container in db
         project.setIp("null");
         project.setContainerId("null");
-        projectMapper.updateProject(project);
+        projectService.updateProject(project);
 
         return true;
     }
 
     /**
-     * 1. call stop to really remove container and stop keeper
-     * 2. remove record of the container in db
+     * 1. remove bind record of the container in db
      */
     @Transactional
     @Override
-    public Boolean destroyContainer(Integer projectId) {
-        // call stop to really remove container and stop keeper
-        stopContainer(projectId);
-
-        // remove record of the container in db
-        projectMapper.deleteProject(projectId);
+    public Boolean destroyContainer(Integer userId, Integer projectId) {
+        // remove bind record of the container in db
+        projectService.unbindProjectFromUser(userId, projectId);
 
         return true;
     }

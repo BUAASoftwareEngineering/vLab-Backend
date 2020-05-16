@@ -12,7 +12,7 @@ public interface DockerManager {
      * @param projectId 数据库中的Id，注意不是docker上下文中的containerId
      * @return 当销毁成功后返回<code>true</code>，否则返回<code>false</code>
      */
-    public Boolean destroyContainer(Integer projectId);
+    public Boolean destroyContainer(Integer userId, Integer projectId);
 
     /**
      * 根据Id开启相应的container
