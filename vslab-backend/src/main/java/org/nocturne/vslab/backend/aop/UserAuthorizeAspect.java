@@ -30,7 +30,8 @@ public class UserAuthorizeAspect {
     @Pointcut("execution(public * org.nocturne.vslab.backend.controller.*.*(..)) && " +
             "!execution(public * org.nocturne.vslab.backend.controller.UserController.login(..)) && " +
             "!execution(public * org.nocturne.vslab.backend.controller.UserController.logout(..)) && " +
-            "!execution(public * org.nocturne.vslab.backend.controller.UserController.register(..))")
+            "!execution(public * org.nocturne.vslab.backend.controller.UserController.register(..)) &&" +
+            "!execution(public * org.nocturne.vslab.backend.controller.UtilController.*(..))")
     public void authPointcut(){}
 
     @Before("authPointcut()")
