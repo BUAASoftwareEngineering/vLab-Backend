@@ -24,7 +24,7 @@ app.use(errorHandler);
 var Cookie = ''
 var tokenId = ''
 var JSESSIONID = ''
-const rootpath = './ProjectFiles/'
+const rootpath = '/ProjectFiles/'
 const port = 6000
 
 async function init() {
@@ -53,7 +53,7 @@ app.get('/download', async function(req, res) {
     console.log(req.query.projectId)
     let filename = 'project' + req.query.projectId.toString() + '.zip'
     let savename = filename
-    let savepath = rootpath + filename
+    let savepath = rootpath + req.query.projectId.toString()
 
     console.log('filename is %s', filename)
     console.log('savename is %s', savename)
@@ -162,7 +162,7 @@ app.post('/delete', async function(req, res) {
     // console.log(req.body.projectId)
     // console.log(req.body.filepath)
     spawn('rm', ['-rf', rootpath + filename])
-    spawn('rm', ['-rf', rootpath + req.body.projectId.toString()])
+    spawn('rm', ['-rf', req.body.projectId.toString()])
     let ret = undefined
     let error = false
     try {

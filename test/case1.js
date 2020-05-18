@@ -1,11 +1,13 @@
 const http = require('http')
 var iconv = require("iconv-lite");
 
+const ip = '120.53.27.31'
+
 function test1() {
     let datas = []
     let size = 0
     http.request({
-        host: '154.8.169.190',
+        host: ip,
         path: '/download?projectId=33',
         port: 6000,
         method: 'GET'
@@ -32,7 +34,7 @@ function test2() {
     let datas = []
     let size = 0
     let req = http.request({
-        host: '154.8.169.190',
+        host: ip,
         path: '/upload',
         port: 6000,
         method: 'POST',
@@ -65,7 +67,7 @@ function test3() {
     let datas = []
     let size = 0
     let req = http.request({
-        host: '154.8.169.190',
+        host: ip,
         path: '/delete',
         port: 6000,
         method: 'POST',
@@ -94,4 +96,4 @@ function test3() {
     req.end()
 }
 
-test3()
+test2()
