@@ -11,23 +11,12 @@ var Connection = 'keep-alive'
 var Content_Type = 'application/x-www-form-urlencoded'
 var Referer = 'https://bhpan.buaa.edu.cn/'
 
-
-var location = ''
-var ticket = ''
 var message = JSON.parse(fs.readFileSync('./message.json', 'utf-8'))
 var username = message['username']
 var password = message['password']
 var rootgns = message['rootgns']
 
 var files = {}
-var download_link = ''
-var upload_link = ''
-var upload_param = {}
-var upload_all_param = {}
-
-var lt = ''
-var execution = ''
-var _eventId = ''
 
 
 async function tryLogin() {
@@ -36,6 +25,11 @@ async function tryLogin() {
     let JSESSIONID = ''
     let tokenId = ''
     let success = false
+    let location = ''
+    let ticket = ''
+    let lt = ''
+    let execution = ''
+    let _eventId = ''
 
     // 200 == success
     var res = await new Promise((resolve) => {
@@ -119,7 +113,15 @@ async function tryLogin() {
             success = false
             resolve(req)
         })
+        req.on('error', function(err) {
+            success = false
+            console.log(err)
+            resolve(res)
+        })
         req.end()
+    }).catch((err)=>{
+        console.log(err)
+        success = false
     })
 
     console.log(Cookie)
@@ -212,9 +214,17 @@ async function tryLogin() {
             success = false
             resolve(req)
         })
+        req.on('error', function(err) {
+            success = false
+            console.log(err)
+            resolve(res)
+        })
         console.log('here')
         req.write(content)
         req.end()
+    }).catch((err)=>{
+        console.log(err)
+        success = false
     })
 
     console.log(Cookie)
@@ -292,7 +302,15 @@ async function tryLogin() {
             success = false
             resolve(req)
         })
+        req.on('error', function(err) {
+            success = false
+            console.log(err)
+            resolve(res)
+        })
         req.end()
+    }).catch((err)=>{
+        console.log(err)
+        success = false
     })
 
     if (success) {
@@ -379,8 +397,16 @@ async function tryLogin() {
             success = false
             resolve(req)
         })
+        req.on('error', function(err) {
+            success = false
+            console.log(err)
+            resolve(res)
+        })
         req.write(content)
         req.end()
+    }).catch((err)=>{
+        console.log(err)
+        success = false
     })
 
     if (success) {
@@ -442,7 +468,7 @@ async function tryLogin() {
                 console.log(result);
                 result = JSON.parse(result)
                 if (result) {
-                    files = {}
+                    // let tmpfiles = {}
                     // for (let i = 0; i < result['dirs'].length; i = i + 1) {
                     //     files[result['dirs'][i]['name']] = result['dirs'][i]
                     // }
@@ -467,9 +493,17 @@ async function tryLogin() {
             success = false
             resolve(req)
         })
+        req.on('error', function(err) {
+            success = false
+            console.log(err)
+            resolve(res)
+        })
         req.write(content)
         req.end()
 
+    }).catch((err)=>{
+        console.log(err)
+        success = false
     })
 
     if (success) {
@@ -485,8 +519,102 @@ async function tryLogin() {
 
 async function tryDownload(Cookie, tokenId, filename, savename, savepath) {
     let success = false
+    let download_link = ''
     if (files[filename] == undefined) {
-        return false
+        res = await new Promise((resolve) => {
+            let datas = []
+            let size = 0
+            let content = JSON.stringify({
+                by: "name",
+                docid: rootgns,
+                sort: "asc"
+            })
+            let req = https.request({
+                host: 'bhpan.buaa.edu.cn',
+                method: 'POST',
+                path: '/api/v1/dir?method=list&tokenid=' + encodeURIComponent(tokenId),
+                headers: {
+                    'Accept': Accept,
+                    'User-Agent': User_Agent,
+                    'Accept-Encoding': Accept_Encoding,
+                    'Accept-Language': Accept_Language,
+                    'Cookie': Cookie,
+                    'Connection': Connection,
+                    'Referer': Referer,
+                    'Sec-Fetch-Site': 'same-origin',
+                    'Sec-Fetch-Mode': 'cors',
+                    'Sec-Fetch-Dest': 'empty',
+                    'Content-Type': 'text/plain;charset=UTF-8',
+                    'Content-Length': content.length
+                }
+            }, (res) => {
+                console.log('POST')
+                console.log(res.headers)
+                console.log(res.statusCode)
+                // let location = res.headers.location
+                if (res.headers['set-cookie']) {
+                    for (let i = 0; i < res.headers['set-cookie'].length; i = i + 1) {
+                        Cookie += res.headers['set-cookie'][i].split(';')[0] + '; '
+                        
+                    }
+                }
+                if (res.statusCode == 200) {
+                    success = true
+                }
+                res.on('data', function (chunk) {
+                    console.log(chunk)
+                    datas.push(chunk)
+                    size += chunk.length
+                })
+                res.on('end', function () {
+                    var buff = Buffer.concat(datas, size);
+                    var result = iconv.decode(buff, "utf8");//转码//var result = buff.toString();//不需要转编码,直接tostring  
+                    console.log(result);
+                    result = JSON.parse(result)
+                    if (result) {
+                        // files = {}
+                        // for (let i = 0; i < result['dirs'].length; i = i + 1) {
+                        //     files[result['dirs'][i]['name']] = result['dirs'][i]
+                        // }
+                        for (let i = 0; i < result['files'].length; i = i + 1) {
+                            files[result['files'][i]['name']] = result['files'][i]["docid"]
+                        }
+                    }
+                    console.log(files)
+                    resolve(res)
+                })
+                res.on('error', function(err) {
+                    console.log(err)
+                    resolve(err)
+                })
+            })
+    
+            req.on('timeout', () => {
+                if (req.res) {
+                    req.res.abort()
+                }
+                req.abort()
+                success = false
+                resolve(req)
+            })
+            req.on('error', function(err) {
+                success = false
+                console.log(err)
+                resolve(res)
+            })
+            req.write(content)
+            req.end()
+    
+        }).catch((err)=>{
+            console.log(err)
+            success = false
+        })
+
+        if (success) {
+            success = false
+        } else {
+            return success
+        }
     }
     res = await new Promise((resolve) => {
         let datas = []
@@ -532,28 +660,39 @@ async function tryDownload(Cookie, tokenId, filename, savename, savepath) {
                 datas.push(chunk)
                 size += chunk.length
             })
+            res.on('error', function(err) {
+                success = false
+                console.log(err)
+                resolve(res)
+            })
             res.on('end', function () {
                 var buff = Buffer.concat(datas, size);
                 var result = iconv.decode(buff, "utf8");//转码//var result = buff.toString();//不需要转编码,直接tostring  
                 console.log(result);
                 result = JSON.parse(result)
                 console.log(result)
-                download_link = result['authrequest'][1]
-                if ((res.statusCode == 200) && (download_link != undefined) && (download_link != '')) {
-                    success = true
+                if (result['authrequest']) {
+                    download_link = result['authrequest'][1]
+                    if ((res.statusCode == 200) && (download_link != undefined) && (download_link != '')) {
+                        success = true
+                    }
                 }
                 resolve(res)
             })
-            res.on('error', function(err) {
-                console.log(err)
-                resolve(res)
-            })
+            
         })
-
+        req.on('error', function(err) {
+            success = false
+            console.log(err)
+            resolve(res)
+        })
         req.write(content)
         console.log('content is')
         console.log(content)
         req.end()
+    }).catch((err)=>{
+        console.log(err)
+        success = false
     })
 
 
@@ -573,7 +712,7 @@ async function tryDownload(Cookie, tokenId, filename, savename, savepath) {
     res = await new Promise((resolve) => {
         let datas = []
         let size = 0
-        https.request({
+        let req = https.request({
             host: download_link.substring('https://'.length, download_link.indexOf('/bhpan_bucket')).split(':')[0],
             method: 'GET',
             port: download_link.substring('https://'.length, download_link.indexOf('/bhpan_bucket')).split(':')[1],
@@ -610,7 +749,9 @@ async function tryDownload(Cookie, tokenId, filename, savename, savepath) {
                 })
                 res.on('end', function () {
                     file.end()
-                    resolve(res)
+                    file.on('finish', function() {
+                        resolve(res)
+                    })
                 })
             } else {
                 res.on('data', function (chunk) {
@@ -629,7 +770,16 @@ async function tryDownload(Cookie, tokenId, filename, savename, savepath) {
                 console.log(err)
                 resolve(res)
             })
-        }).end()
+        })
+        req.on('error', function(err) {
+            success = false
+            console.log(err)
+            resolve(res)
+        })
+        req.end()
+    }).catch((err)=>{
+        console.log(err)
+        success = false
     })
 
     return success
@@ -637,6 +787,9 @@ async function tryDownload(Cookie, tokenId, filename, savename, savepath) {
 
 async function tryUpload(Cookie, tokenId, filepath, uploadname) {
     let success = false
+    let upload_link = ''
+    let upload_param = {}
+    let upload_all_param = {}
     res = await new Promise((resolve) => {
         let datas = []
         let size = 0
@@ -690,12 +843,15 @@ async function tryUpload(Cookie, tokenId, filepath, uploadname) {
                 console.log(result);
                 result = JSON.parse(result)
                 console.log(result)
-                upload_link = result['authrequest'][1]
-                upload_param = result['authrequest']
-                upload_all_param = result
-                if ((res.statusCode == 200) && (upload_link != undefined) && (upload_link != '')) {
-                    success = true
+                if (result['authrequest']) {
+                    upload_link = result['authrequest'][1]
+                    upload_param = result['authrequest']
+                    upload_all_param = result
+                    if ((res.statusCode == 200) && (upload_link != undefined) && (upload_link != '')) {
+                        success = true
+                    }
                 }
+                
                 resolve(res)
             })
             res.on('error', function(err) {
@@ -703,9 +859,16 @@ async function tryUpload(Cookie, tokenId, filepath, uploadname) {
                 resolve(res)
             })
         })
-
+        req.on('error', function(err) {
+            success = false
+            console.log(err)
+            resolve(res)
+        })
         req.write(content)
         req.end()
+    }).catch((err)=>{
+        console.log(err)
+        success = false
     })
     // console.log(Date.now())
 
@@ -773,9 +936,16 @@ async function tryUpload(Cookie, tokenId, filepath, uploadname) {
                 resolve(res)
             })
         })
-
+        req.on('error', function(err) {
+            success = false
+            console.log(err)
+            resolve(res)
+        })
         form.pipe(req)
         // req.end()
+    }).catch((err)=>{
+        console.log(err)
+        success = false
     })
 
 
@@ -836,9 +1006,16 @@ async function tryUpload(Cookie, tokenId, filepath, uploadname) {
                 resolve(res)
             })
         })
-
+        req.on('error', function(err) {
+            success = false
+            console.log(err)
+            resolve(res)
+        })
         req.write(content)
         req.end()
+    }).catch((err)=>{
+        console.log(err)
+        success = false
     })
 
     if (success) {
@@ -850,13 +1027,274 @@ async function tryUpload(Cookie, tokenId, filepath, uploadname) {
     return false
 }
 
+async function tryDelete(Cookie, tokenId, filename) {
+    if (files[filename] == undefined) {
+        res = await new Promise((resolve) => {
+            let datas = []
+            let size = 0
+            let content = JSON.stringify({
+                by: "name",
+                docid: rootgns,
+                sort: "asc"
+            })
+            let req = https.request({
+                host: 'bhpan.buaa.edu.cn',
+                method: 'POST',
+                path: '/api/v1/dir?method=list&tokenid=' + encodeURIComponent(tokenId),
+                headers: {
+                    'Accept': Accept,
+                    'User-Agent': User_Agent,
+                    'Accept-Encoding': Accept_Encoding,
+                    'Accept-Language': Accept_Language,
+                    'Cookie': Cookie,
+                    'Connection': Connection,
+                    'Referer': Referer,
+                    'Sec-Fetch-Site': 'same-origin',
+                    'Sec-Fetch-Mode': 'cors',
+                    'Sec-Fetch-Dest': 'empty',
+                    'Content-Type': 'text/plain;charset=UTF-8',
+                    'Content-Length': content.length
+                }
+            }, (res) => {
+                console.log('POST')
+                console.log(res.headers)
+                console.log(res.statusCode)
+                // let location = res.headers.location
+                if (res.headers['set-cookie']) {
+                    for (let i = 0; i < res.headers['set-cookie'].length; i = i + 1) {
+                        Cookie += res.headers['set-cookie'][i].split(';')[0] + '; '
+                        if (res.headers['set-cookie'][i].indexOf('JSESSIONID') != -1) {
+                            JSESSIONID = res.headers['set-cookie'][i].split(';')[0].split('=')[1]
+                        }
+                    }
+                }
+                if (res.statusCode == 200) {
+                    success = true
+                }
+                res.on('data', function (chunk) {
+                    console.log(chunk)
+                    datas.push(chunk)
+                    size += chunk.length
+                })
+                res.on('end', function () {
+                    var buff = Buffer.concat(datas, size);
+                    var result = iconv.decode(buff, "utf8");//转码//var result = buff.toString();//不需要转编码,直接tostring  
+                    console.log(result);
+                    result = JSON.parse(result)
+                    if (result) {
+                        // files = {}
+                        // for (let i = 0; i < result['dirs'].length; i = i + 1) {
+                        //     files[result['dirs'][i]['name']] = result['dirs'][i]
+                        // }
+                        for (let i = 0; i < result['files'].length; i = i + 1) {
+                            files[result['files'][i]['name']] = result['files'][i]["docid"]
+                        }
+                    }
+                    console.log(files)
+                    resolve(res)
+                })
+                res.on('error', function(err) {
+                    console.log(err)
+                    resolve(err)
+                })
+            })
+    
+            req.on('timeout', () => {
+                if (req.res) {
+                    req.res.abort()
+                }
+                req.abort()
+                success = false
+                resolve(req)
+            })
+            req.on('error', function(err) {
+                success = false
+                console.log(err)
+                resolve(res)
+            })
+            req.write(content)
+            req.end()
+    
+        }).catch((err)=>{
+            console.log(err)
+            success = false
+        })
+
+        if (success) {
+            success = false
+        } else {
+            return success
+        }
+    }
+
+    res = await new Promise((resolve) => {
+        let datas = []
+        let size = 0
+        let content = JSON.stringify({
+            docid: files[filename]
+        })
+        let req = https.request({
+            host: 'bhpan.buaa.edu.cn',
+            method: 'POST',
+            path: '/api/v1/file?method=delete&tokenid=' + encodeURIComponent(tokenId),
+            headers: {
+                'Accept': Accept,
+                'User-Agent': User_Agent,
+                'Accept-Encoding': Accept_Encoding,
+                'Accept-Language': Accept_Language,
+                'Cookie': Cookie,
+                'Connection': Connection,
+                'Referer': Referer,
+                'Sec-Fetch-Site': 'same-origin',
+                'Sec-Fetch-Mode': 'cors',
+                'Sec-Fetch-Dest': 'empty',
+                'Content-Type': 'text/plain;charset=UTF-8',
+                'Content-Length': content.length
+            }
+        }, (res) => {
+            console.log('POST')
+            console.log(res.headers)
+            console.log(res.statusCode)
+            // let location = res.headers.location
+            if (res.headers['set-cookie']) {
+                for (let i = 0; i < res.headers['set-cookie'].length; i = i + 1) {
+                    Cookie += res.headers['set-cookie'][i].split(';')[0] + '; '
+                }
+            }
+            if (res.statusCode == 200) {
+                success = true
+            }
+            res.on('data', function (chunk) {
+                console.log(chunk)
+                datas.push(chunk)
+                size += chunk.length
+            })
+            res.on('end', function () {
+                var buff = Buffer.concat(datas, size);
+                var result = iconv.decode(buff, "utf8");//转码//var result = buff.toString();//不需要转编码,直接tostring  
+                console.log(result);
+                resolve(res)
+            })
+            res.on('error', function(err) {
+                console.log(err)
+                resolve(err)
+            })
+        })
+
+        req.on('timeout', () => {
+            if (req.res) {
+                req.res.abort()
+            }
+            req.abort()
+            success = false
+            resolve(req)
+        })
+        req.on('error', function(err) {
+            success = false
+            console.log(err)
+            resolve(res)
+        })
+        req.write(content)
+        req.end()
+
+    }).catch((err)=>{
+        console.log(err)
+        success = false
+    })
+
+    if (success) {
+        success = false
+    } else {
+        return success
+    }
+
+    res = await new Promise((resolve) => {
+        let datas = []
+        let size = 0
+        let content = JSON.stringify({
+            docid: files[filename]
+        })
+        let req = https.request({
+            host: 'bhpan.buaa.edu.cn',
+            method: 'POST',
+            path: '/api/v1/file?method=attribute&tokenid=' + encodeURIComponent(tokenId),
+            headers: {
+                'Accept': Accept,
+                'User-Agent': User_Agent,
+                'Accept-Encoding': Accept_Encoding,
+                'Accept-Language': Accept_Language,
+                'Cookie': Cookie,
+                'Connection': Connection,
+                'Referer': Referer,
+                'Sec-Fetch-Site': 'same-origin',
+                'Sec-Fetch-Mode': 'cors',
+                'Sec-Fetch-Dest': 'empty',
+                'Content-Type': 'text/plain;charset=UTF-8',
+                'Content-Length': content.length
+            }
+        }, (res) => {
+            console.log('POST')
+            console.log(res.headers)
+            console.log(res.statusCode)
+            // let location = res.headers.location
+            if (res.headers['set-cookie']) {
+                for (let i = 0; i < res.headers['set-cookie'].length; i = i + 1) {
+                    Cookie += res.headers['set-cookie'][i].split(';')[0] + '; '
+                }
+            }
+            
+            res.on('data', function (chunk) {
+                console.log(chunk)
+                datas.push(chunk)
+                size += chunk.length
+            })
+            res.on('end', function () {
+                var buff = Buffer.concat(datas, size);
+                var result = iconv.decode(buff, "utf8");//转码//var result = buff.toString();//不需要转编码,直接tostring  
+                console.log(result);
+                if ((res.statusCode == 404) && (JSON.parse(result).errcode == 404006)) {
+                    files[filename] = undefined
+                    success = true
+                }
+                resolve(res)
+            })
+            res.on('error', function(err) {
+                console.log(err)
+                resolve(err)
+            })
+        })
+
+        req.on('timeout', () => {
+            if (req.res) {
+                req.res.abort()
+            }
+            req.abort()
+            success = false
+            resolve(req)
+        })
+        req.on('error', function(err) {
+            success = false
+            console.log(err)
+            resolve(res)
+        })
+        req.write(content)
+        req.end()
+
+    }).catch((err)=>{
+        console.log(err)
+        success = false
+    })
+
+    return success
+}
+
 async function login(times=0) {
     if (times == 0) {
         times = -1
     }
     while (times != 0) {
         try {
-            let ret = await tryLogin()
+            let ret = await tryLogin().catch((err)=>console.log(err))
             if ((ret.Cookie) && (ret.tokenId) && (ret.JSESSIONID)) {
                 return ret
             }
@@ -884,5 +1322,6 @@ module.exports = {
     tryLogin,
     tryDownload,
     tryUpload,
+    tryDelete,
     login
 }
