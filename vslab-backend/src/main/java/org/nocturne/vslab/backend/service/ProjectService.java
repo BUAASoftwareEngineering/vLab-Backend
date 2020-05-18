@@ -75,9 +75,9 @@ public class ProjectService {
 
         if (holders.size() == 1) {
             Project project = projectMapper.getProjectById(projectId);
+            dockerManager.stopContainer(projectId);
             if (!"null".equals(project.getIp())) CloudFileHelper.deleteRemoteFile(project.getIp(), projectId);
 
-            dockerManager.stopContainer(projectId);
             userProjectMapper.unbindProjectFromUser(userId, projectId);
             projectMapper.deleteProject(projectId);
         } else {
