@@ -5,6 +5,7 @@ import org.nocturne.vslab.backend.exceptiion.project.ProjectNotFoundException;
 import org.nocturne.vslab.backend.manager.DockerManager;
 import org.nocturne.vslab.backend.mapper.ProjectMapper;
 import org.nocturne.vslab.backend.mapper.UserProjectMapper;
+import org.nocturne.vslab.backend.util.CloudFileHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -70,12 +71,17 @@ public class ProjectService {
 
     @Transactional
     public void unbindProjectFromUser(Integer userId, Integer projectId) {
-        userProjectMapper.unbindProjectFromUser(userId, projectId);
-
         List<Integer> holders = userProjectMapper.getHoldersOfProjects(projectId);
-        if (holders.isEmpty()) {
+
+        if (holders.size() == 1) {
+            Project project = projectMapper.getProjectById(projectId);
+            if (!"null".equals(project.getIp())) CloudFileHelper.deleteRemoteFile(project.getIp(), projectId);
+
             dockerManager.stopContainer(projectId);
+            userProjectMapper.unbindProjectFromUser(userId, projectId);
             projectMapper.deleteProject(projectId);
+        } else {
+            userProjectMapper.unbindProjectFromUser(userId, projectId);
         }
     }
 }

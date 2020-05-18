@@ -2,14 +2,13 @@ package org.nocturne.vslab.backend.manager;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
-import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.api.model.HostConfig;
-import com.github.dockerjava.api.model.Ports;
+import com.github.dockerjava.api.model.*;
 import org.nocturne.vslab.backend.bean.Project;
 import org.nocturne.vslab.backend.bean.ImageType;
 import org.nocturne.vslab.backend.docker.DockerClientFactory;
 import org.nocturne.vslab.backend.docker.DockerHostConfig;
 import org.nocturne.vslab.backend.service.ProjectService;
+import org.nocturne.vslab.backend.util.CloudFileHelper;
 import org.nocturne.vslab.backend.util.ContainerLiveKeeper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -36,7 +35,7 @@ public class DockerManagerImpl implements DockerManager {
     private final ProjectService projectService;
 
     private static final List<ExposedPort> exposedPortList = new ArrayList<>();
-    private static final HostConfig hostConfig;
+    private static final Ports portBindings;
 
 
     static {
@@ -46,16 +45,10 @@ public class DockerManagerImpl implements DockerManager {
         exposedPortList.add(ExposedPort.tcp(LANGUAGE_PORT));
 
         // bind expose port
-        Ports portBindings = new Ports();
+        portBindings = new Ports();
         portBindings.bind(exposedPortList.get(0), Ports.Binding.empty());
         portBindings.bind(exposedPortList.get(1), Ports.Binding.empty());
         portBindings.bind(exposedPortList.get(2), Ports.Binding.empty());
-
-        // set resource limit to container
-        hostConfig = HostConfig.newHostConfig()
-                .withPortBindings(portBindings)
-                .withPublishAllPorts(false)
-                .withMemory(300 * 1024 * 1024L);
     }
 
     @Lazy
@@ -74,7 +67,7 @@ public class DockerManagerImpl implements DockerManager {
     public Project createContainer(Integer userId, String projectName, ImageType imageType) {
         Project project = new Project(null, "null",
                 imageType, projectName,
-                "null", 0, 0, 0, false);
+                "null", 0, 0, 0, true);
         projectService.createProject(userId, project);
 
         return project;
@@ -85,7 +78,7 @@ public class DockerManagerImpl implements DockerManager {
      * container 并未被创建 （db 中该 container 的 ip is null）
      *
      * 该函数会完成下列几项工作
-     * 1. 随机选取 docker host 创建并运行 container
+     * 1. 随机选取 docker host，从云上下载文件然后创建并运行 container
      * 2. 更新数据库为实装数据
      * 3. 启动 keeper 监控容器活跃
      */
@@ -99,13 +92,7 @@ public class DockerManagerImpl implements DockerManager {
         String ip = DockerHostConfig.getIPRandomly();
 
         DockerClient dockerClient = DockerClientFactory.getDockerClient(ip);
-        CreateContainerResponse response = dockerClient
-                .createContainerCmd(project.getImageType().getImageName())
-                .withEnv(String.format("HOST_IP=%s", ip))
-                .withExposedPorts(exposedPortList)
-                .withHostConfig(hostConfig)
-                .exec();
-        String containerId = response.getId().substring(0, 12);
+        String containerId = createNewContainer(projectId, ip, project.getImageType());
 
         dockerClient.startContainerCmd(containerId).exec();
 
@@ -126,8 +113,28 @@ public class DockerManagerImpl implements DockerManager {
         return true;
     }
 
+    private String createNewContainer(Integer projectId, String ip, ImageType imageType) {
+        CloudFileHelper.downloadFile(ip, projectId);
+
+        HostConfig hostConfig = HostConfig.newHostConfig()
+                .withPortBindings(portBindings)
+                .withPublishAllPorts(false)
+                .withMemory(300 * 1024 * 1024L)
+                .withBinds(new Bind("/ProjectFiles/" + projectId, new Volume("/code")));
+
+        DockerClient dockerClient = DockerClientFactory.getDockerClient(ip);
+        CreateContainerResponse response = dockerClient
+                .createContainerCmd(imageType.getImageName())
+                .withEnv(String.format("HOST_IP=%s", ip))
+                .withExposedPorts(exposedPortList)
+                .withHostConfig(hostConfig)
+                .exec();
+
+        return response.getId().substring(0, 12);
+    }
+
     /**
-     * 1. remove special container
+     * 1. upload local file to cloud and remove special container
      * 2. stop keeper which is monitoring it
      * 3. reset record of the container in db
      */
@@ -136,7 +143,8 @@ public class DockerManagerImpl implements DockerManager {
         Project project = projectService.getProjectById(projectId);
         if ("null".equals(project.getIp())) return true;
 
-        // remove special container
+        // upload local file to cloud and remove special container
+        CloudFileHelper.uploadFile(project.getIp(), projectId);
         DockerClient dockerClient = DockerClientFactory.getDockerClient(project.getIp());
         dockerClient.removeContainerCmd(project.getContainerId()).withForce(true).exec();
 
@@ -153,6 +161,7 @@ public class DockerManagerImpl implements DockerManager {
 
     /**
      * 1. remove bind record of the container in db
+     * 2. remove remote file on cloud
      */
     @Transactional
     @Override
