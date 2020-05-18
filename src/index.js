@@ -111,11 +111,11 @@ app.post('/upload', async function(req, res) {
     console.log('param is')
     console.log(req.body)
     
-    let dirpath = rootpath + 'project' + req.body.projectId.toString() + '/'
+    let dirpath = rootpath + req.body.projectId.toString() + '/'
     let filepath = rootpath + 'project' + req.body.projectId.toString() + '.zip'
     let uploadname = 'project' + req.body.projectId.toString() + '.zip'
     spawnSync('rm', ['-rf', filepath])
-    let wy = spawnSync('sh', ['./src/zipfile.sh', rootpath, 'project' + req.body.projectId.toString() + '.zip', 'project' + req.body.projectId.toString() + '/\*'])
+    let wy = spawnSync('sh', ['./src/zipfile.sh', rootpath, 'project' + req.body.projectId.toString() + '.zip', req.body.projectId.toString() + '/\*'])
     
     console.log(wy.stdout.toString())
     console.log(wy.stderr.toString())
@@ -162,7 +162,7 @@ app.post('/delete', async function(req, res) {
     // console.log(req.body.projectId)
     // console.log(req.body.filepath)
     spawn('rm', ['-rf', rootpath + filename])
-    spawn('rm', ['-rf', rootpath + 'project' + req.body.projectId.toString()])
+    spawn('rm', ['-rf', rootpath + req.body.projectId.toString()])
     let ret = undefined
     let error = false
     try {

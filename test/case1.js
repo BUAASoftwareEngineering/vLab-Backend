@@ -5,7 +5,7 @@ function test1() {
     let datas = []
     let size = 0
     http.request({
-        host: 'localhost',
+        host: '154.8.169.190',
         path: '/download?projectId=33',
         port: 6000,
         method: 'GET'
@@ -32,7 +32,7 @@ function test2() {
     let datas = []
     let size = 0
     let req = http.request({
-        host: 'localhost',
+        host: '154.8.169.190',
         path: '/upload',
         port: 6000,
         method: 'POST',
@@ -65,7 +65,7 @@ function test3() {
     let datas = []
     let size = 0
     let req = http.request({
-        host: 'localhost',
+        host: '154.8.169.190',
         path: '/delete',
         port: 6000,
         method: 'POST',
