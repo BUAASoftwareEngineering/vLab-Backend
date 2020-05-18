@@ -1,6 +1,5 @@
 package org.nocturne.vslab.backend.controller;
 
-import org.apache.ibatis.annotations.Param;
 import org.nocturne.vslab.backend.bean.Result;
 import org.nocturne.vslab.backend.bean.User;
 import org.nocturne.vslab.backend.mapper.UserMapper;
@@ -55,9 +54,9 @@ public class UtilController {
         String captcha = captchaPool.generateCaptcha(email);
 
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("vlab_team@163.com");
+        message.setFrom("vlab_team@yeah.net");
         message.setTo(email);
-        message.setCc("vlab_team@163.com");
+        message.setCc("vlab_team@yeah.net");
         message.setSubject("vlab很高兴和您相遇");
         message.setText("终于等到你，还好我没放弃~\n" +
                 "听说你也在找我，其实我也在等你哦！\n" +

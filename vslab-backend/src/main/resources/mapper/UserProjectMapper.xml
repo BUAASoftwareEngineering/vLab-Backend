@@ -3,9 +3,9 @@
 
 <mapper namespace="org.nocturne.vslab.backend.mapper.UserProjectMapper">
 
-    <!-- public void bindProjectToUser(@Param("userId") Integer userId, @Param("projectId") Integer projectId); -->
+    <!-- public void bindProjectToUser(@Param("userId") Integer userId, @Param("projectId") Integer projectId, @Param("writeable") Boolean writeable); -->
     <insert id="bindProjectToUser">
-        INSERT INTO tb_user_project (user_id, project_id) VALUES (#{userId}, #{projectId})
+        INSERT INTO tb_user_project (user_id, project_id, writeable) VALUES (#{userId}, #{projectId}, #{writeable})
     </insert>
 
     <!-- public void unbindProjectFromUser(@Param("userId") Integer userId, @Param("projectId") Integer projectId); -->

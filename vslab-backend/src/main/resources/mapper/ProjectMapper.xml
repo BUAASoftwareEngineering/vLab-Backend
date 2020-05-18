@@ -12,11 +12,12 @@
         <result column="terminal_port" property="terminalPort"/>
         <result column="server_port" property="serverPort"/>
         <result column="language_port" property="languagePort"/>
+        <result column="writeable" property="writeable"/>
     </resultMap>
 
     <!-- public List<Project> getProjectsOfUser(Integer userId); -->
     <select id="getProjectsOfUser" resultMap="baseResultMap">
-        SELECT type, container_id, project_name, ip, terminal_port, server_port, tb_project.project_id, language_port
+        SELECT type, container_id, project_name, ip, terminal_port, server_port, tb_project.project_id, language_port, writeable
         FROM tb_project, tb_user_project
         WHERE tb_user_project.project_id = tb_project.project_id AND user_id = #{userId}
     </select>
@@ -30,9 +31,9 @@
 
     <!-- public Project getProjectById(Integer projectId); -->
     <select id="getProjectById" resultMap="baseResultMap">
-        SELECT *
-        FROM tb_project
-        WHERE project_id = #{projectId}
+        SELECT type, container_id, project_name, ip, terminal_port, server_port, tb_project.project_id, language_port, writeable
+        FROM tb_project, tb_user_project
+        WHERE tb_project.project_id = tb_user_project.project_id AND tb_project.project_id = #{projectId}
     </select>
 
     <!-- public void createProject(Project project); -->

@@ -29,4 +29,6 @@ public class Project implements Serializable {
     private Integer serverPort;
     private Integer terminalPort;
     private Integer languagePort;
+
+    private Boolean writeable;
 }

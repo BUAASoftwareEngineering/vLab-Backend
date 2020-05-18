@@ -74,7 +74,7 @@ public class DockerManagerImpl implements DockerManager {
     public Project createContainer(Integer userId, String projectName, ImageType imageType) {
         Project project = new Project(null, "null",
                 imageType, projectName,
-                "null", 0, 0, 0);
+                "null", 0, 0, 0, false);
         projectService.createProject(userId, project);
 
         return project;

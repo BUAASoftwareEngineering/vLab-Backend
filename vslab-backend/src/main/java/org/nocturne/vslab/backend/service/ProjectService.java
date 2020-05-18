@@ -45,7 +45,7 @@ public class ProjectService {
     @Transactional
     public void createProject(Integer userId, Project project) {
         projectMapper.createProject(project);
-        userProjectMapper.bindProjectToUser(userId, project.getProjectId());
+        userProjectMapper.bindProjectToUser(userId, project.getProjectId(), Boolean.TRUE);
     }
 
     public void updateProject(Project project) {
@@ -57,7 +57,11 @@ public class ProjectService {
     }
 
     public void bindProjectToUser(Integer userId, Integer projectId) {
-        userProjectMapper.bindProjectToUser(userId, projectId);
+        this.bindProjectToUser(userId, projectId, Boolean.FALSE);
+    }
+
+    public void bindProjectToUser(Integer userId, Integer projectId, Boolean writeable) {
+        userProjectMapper.bindProjectToUser(userId, projectId, writeable);
     }
 
     public void unbindProjectFromUser(Integer userId, Project project) {
