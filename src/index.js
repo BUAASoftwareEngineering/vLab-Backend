@@ -162,7 +162,7 @@ app.post('/delete', async function(req, res) {
     // console.log(req.body.projectId)
     // console.log(req.body.filepath)
     spawn('rm', ['-rf', rootpath + filename])
-    spawn('rm', ['-rf', req.body.projectId.toString()])
+    spawn('rm', ['-rf', rootpath + req.body.projectId.toString()])
     let ret = undefined
     let error = false
     try {

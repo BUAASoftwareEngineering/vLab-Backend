@@ -1,7 +1,7 @@
 const http = require('http')
 var iconv = require("iconv-lite");
 
-const ip = '120.53.27.31'
+const ip = '154.8.169.190'
 
 function test1() {
     let datas = []
@@ -96,4 +96,4 @@ function test3() {
     req.end()
 }
 
-test1()
+test3()
