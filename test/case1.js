@@ -96,4 +96,4 @@ function test3() {
     req.end()
 }
 
-test2()
+test1()

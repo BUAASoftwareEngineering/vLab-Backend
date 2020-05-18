@@ -53,7 +53,7 @@ app.get('/download', async function(req, res) {
     console.log(req.query.projectId)
     let filename = 'project' + req.query.projectId.toString() + '.zip'
     let savename = filename
-    let savepath = rootpath + req.query.projectId.toString()
+    let savepath = req.query.projectId.toString()
 
     console.log('filename is %s', filename)
     console.log('savename is %s', savename)
