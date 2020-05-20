@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjectService {
@@ -34,6 +35,8 @@ public class ProjectService {
         return projectMapper.getProjectsOfUser(userId);
     }
 
+    // no granted for writeable field
+    // this method only offer project info without writeable info
     public Project getProjectById(Integer projectId) {
         Project project = projectMapper.getProjectById(projectId);
 
@@ -41,6 +44,16 @@ public class ProjectService {
             throw new ProjectNotFoundException();
         }
         return project;
+    }
+
+    // this method will offer project info with writeable info
+    public Project getProjectById(Integer projectId, Integer userId) {
+        List<Project> projects = projectMapper.getProjectsOfUser(userId);
+
+        if (projects == null || projects.stream().noneMatch(x -> x.getProjectId().equals(projectId))) {
+            throw new ProjectNotFoundException();
+        }
+        return projects.stream().filter(x -> x.getProjectId().equals(projectId)).collect(Collectors.toList()).get(0);
     }
 
     @Transactional

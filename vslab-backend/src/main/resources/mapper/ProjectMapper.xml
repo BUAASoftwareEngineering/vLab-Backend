@@ -34,6 +34,7 @@
         SELECT type, container_id, project_name, ip, terminal_port, server_port, tb_project.project_id, language_port, writeable
         FROM tb_project, tb_user_project
         WHERE tb_project.project_id = tb_user_project.project_id AND tb_project.project_id = #{projectId}
+        LIMIT 1
     </select>
 
     <!-- public void createProject(Project project); -->

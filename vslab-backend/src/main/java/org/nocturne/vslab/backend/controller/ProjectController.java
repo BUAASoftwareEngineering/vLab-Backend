@@ -57,8 +57,9 @@ public class ProjectController {
 
     @PostMapping("/info_update")
     public Result updateProjectInfo(@RequestParam(PARAM_PROJECT_ID) Integer projectId,
-                                    @RequestParam(PARAM_PROJECT_NAME) String projectName) {
-        Project project = projectService.getProjectById(projectId);
+                                    @RequestParam(PARAM_PROJECT_NAME) String projectName,
+                                    @CookieValue(PARAM_USER_ID) Integer userId) {
+        Project project = projectService.getProjectById(projectId, userId);
 
         project.setName(projectName);
         projectService.updateProject(project);
@@ -67,10 +68,11 @@ public class ProjectController {
     }
 
     @PostMapping("/enter")
-    public Result enterProject(@RequestParam(PARAM_PROJECT_ID) Integer projectId) {
+    public Result enterProject(@RequestParam(PARAM_PROJECT_ID) Integer projectId,
+                               @CookieValue(COOKIE_USER_ID) Integer userId) {
         dockerManager.startContainer(projectId);
 
-        Project project = projectService.getProjectById(projectId);
+        Project project = projectService.getProjectById(projectId, userId);
         return new Result(0, "启动成功", project);
     }
 

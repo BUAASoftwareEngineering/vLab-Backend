@@ -13,6 +13,7 @@ public class StringConst {
     public static final String PARAM_PROJECT_ID = "project_id";
     public static final String PARAM_PROJECT_NAME = "project_name";
     public static final String PARAM_PROJECT_TYPE = "project_type";
+    public static final String PARAM_PROJECT_WRITEABLE = "writeable";
 
     public static final String PARAM_FILE_PATH = "file_path";
     public static final String PARAM_FILE_OLD_PATH = "old_path";
