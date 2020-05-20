@@ -30,14 +30,19 @@ function solve_data(data) {
 function read_dir(path) {
     let obj = []
     fs.readdirSync(path).forEach(function (file) {
-        var pathname = path + file
-        let sub_obj = {
-            title: file
+        let pathname = path + file
+        if ((file[0] == '.') || ((file == '__pycache__') && (fs.statSync(pathname).isDirectory()))) {
+
+        } else {
+            let sub_obj = {
+                title: file
+            }
+            if (fs.statSync(pathname).isDirectory()) {
+                sub_obj.children = read_dir(pathname + '/')
+            }
+            obj.push(sub_obj)
         }
-        if (fs.statSync(pathname).isDirectory()) {
-            sub_obj.children = read_dir(pathname + '/')
-        }
-        obj.push(sub_obj)
+
     });
     return obj
 }
@@ -52,7 +57,7 @@ function file_struct(data) {
     return {
         code: 0,
         message: 'get file struct success!',
-        data: struct 
+        data: struct
     }
 }
 
@@ -68,20 +73,21 @@ function file_content(data) {
             content: Buffer.from(new TextEncoder('utf-8').encode(fs.readFileSync(path, 'utf-8')))
         }
     }
-        
+
 }
 
 function file_update(data) {
     let obj = data
     let path = obj.file_path
     console.log(obj)
-    fs.writeFileSync(path, new TextDecoder('utf-8').decode(Buffer.from(JSON.parse(obj.file_content), 'utf-8')))
+    // fs.writeFileSync()
+    fs.writeFileSync(path, Buffer.from(JSON.parse(obj.file_content)))
     return {
         code: 0,
         message: 'file update success!',
         data: {}
     }
-        
+
 }
 
 function file_new(data) {
@@ -92,6 +98,43 @@ function file_new(data) {
             code: -301,
             message: '存在同名文件或文件夹，操作失败！',
             data: {}
+        }
+    }
+    let dir_path = ''
+    // console.log('aaa')
+    for (let i = path.length - 1; i >= 0; i = i - 1) {
+        if (path[i] == '/') {
+            // console.log(i)
+            dir_path = path.substring(0, i)
+            break
+        }
+    }
+    // console.log(dir_path)
+    if (fs.existsSync(dir_path)) {
+        if (!fs.statSync(dir_path).isDirectory()) {
+            return {
+                code: -301,
+                message: '存在同名文件或文件夹，操作失败！',
+                data: {}
+            }
+        }
+    } else if (dir_path != '') {
+        let ret = spawnSync('mkdir', ['-p', dir_path])
+        if (ret.error != undefined) {
+            console.log(ret.error)
+            return {
+                code: 500,
+                message: ret.error.message,
+                data: {}
+            }
+        } else if (ret.stderr != undefined) {
+            if (ret.stderr.toString().length != 0) {
+                return {
+                    code: -300,
+                    message: ret.stderr.toString(),
+                    data: {}
+                }
+            }
         }
     }
     fs.writeFileSync(path, '', 'utf-8')
@@ -105,14 +148,14 @@ function file_new(data) {
 function file_delete(data) {
     let obj = data
     let path = obj.file_path
-    
+
     fs.unlinkSync(path)
     return {
         code: 0,
         message: 'delete file success!',
         data: {}
     }
-        
+
 }
 
 function file_move(data) {
@@ -120,7 +163,7 @@ function file_move(data) {
     let old_path = obj.old_path
     let new_path = obj.new_path
     let force = JSON.parse(obj.force)
-    
+
     if (old_path != new_path && fs.existsSync(new_path) && !force) {
         return {
             code: -301,
@@ -130,7 +173,7 @@ function file_move(data) {
     }
 
     if (fs.existsSync(new_path) && old_path != new_path) {
-        let ret = spawnSync('rm',['-rf',new_path])
+        let ret = spawnSync('rm', ['-rf', new_path])
         if (ret.error != undefined) {
             return {
                 code: 500,
@@ -145,7 +188,7 @@ function file_move(data) {
                     data: {}
                 }
             }
-        } 
+        }
     }
     fs.renameSync(old_path, new_path)
     return {
@@ -170,7 +213,7 @@ function file_copy(data) {
     }
 
     if (fs.existsSync(new_path) && old_path != new_path) {
-        let ret = spawnSync('rm',['-rf',new_path])
+        let ret = spawnSync('rm', ['-rf', new_path])
         if (ret.error != undefined) {
             console.log(ret.error)
             return {
@@ -186,7 +229,7 @@ function file_copy(data) {
                     data: {}
                 }
             }
-        } 
+        }
     }
     fs.copyFileSync(old_path, new_path)
     return {
@@ -227,7 +270,25 @@ function dir_new(data) {
             data: {}
         }
     }
-    fs.mkdirSync(dir_path)
+    let ret = spawnSync('mkdir', ['-p', dir_path])
+    if (ret.error != undefined) {
+        console.log(ret.error)
+        return {
+            code: 500,
+            message: ret.error.message,
+            data: {}
+        }
+    } else if (ret.stderr != undefined) {
+        if (ret.stderr.toString().length != 0) {
+            return {
+                code: -300,
+                message: ret.stderr.toString(),
+                data: {}
+            }
+        }
+    }
+    // fs.spawnSync('mkdir', ['-p', dir_path])
+    // fs.mkdirSync(dir_path)
     return {
         code: 0,
         message: 'mkdir success!',
@@ -238,8 +299,8 @@ function dir_new(data) {
 function dir_delete(data) {
     let obj = data
     let dir_path = obj.dir_path
-    
-    let ret = spawnSync('rm',['-rf',dir_path])
+
+    let ret = spawnSync('rm', ['-rf', dir_path])
     if (ret.error != undefined) {
         return {
             code: 500,
@@ -254,13 +315,13 @@ function dir_delete(data) {
                 data: {}
             }
         }
-    } 
+    }
     return {
         code: 0,
         message: 'remove dir success!',
         data: {}
     }
-    
+
 }
 
 function dir_move(data) {
@@ -268,7 +329,7 @@ function dir_move(data) {
     let old_path = obj.old_path
     let new_path = obj.new_path
     let force = JSON.parse(obj.force)
-    
+
     if (old_path != new_path && fs.existsSync(new_path) && !force) {
         return {
             code: -301,
@@ -278,7 +339,7 @@ function dir_move(data) {
     }
 
     if (fs.existsSync(new_path)) {
-        let ret = spawnSync('rm',['-rf',new_path])
+        let ret = spawnSync('rm', ['-rf', new_path])
         if (ret.error != undefined) {
             return {
                 code: 500,
@@ -293,9 +354,9 @@ function dir_move(data) {
                     data: {}
                 }
             }
-        } 
+        }
     }
-    let ret = spawnSync('mv',['-f',old_path,new_path])
+    let ret = spawnSync('mv', ['-f', old_path, new_path])
     if (ret.error != undefined) {
         return {
             code: 500,
@@ -310,7 +371,7 @@ function dir_move(data) {
                 data: {}
             }
         }
-    } 
+    }
 
     return {
         code: 0,
@@ -324,7 +385,7 @@ function dir_copy(data) {
     let old_path = obj.old_path
     let new_path = obj.new_path
     let force = JSON.parse(obj.force)
-    
+
     if (old_path != new_path && fs.existsSync(new_path) && !force) {
         return {
             code: -301,
@@ -334,7 +395,7 @@ function dir_copy(data) {
     }
 
     if (fs.existsSync(new_path)) {
-        let ret = spawnSync('rm',['-rf',new_path])
+        let ret = spawnSync('rm', ['-rf', new_path])
         if (ret.error != undefined) {
             return {
                 code: 500,
@@ -349,9 +410,9 @@ function dir_copy(data) {
                     data: {}
                 }
             }
-        } 
+        }
     }
-    let ret = spawnSync('cp',['-rf',old_path,new_path])
+    let ret = spawnSync('cp', ['-rf', old_path, new_path])
     if (ret.error != undefined) {
         return {
             code: 500,
@@ -366,7 +427,7 @@ function dir_copy(data) {
                 data: {}
             }
         }
-    } 
+    }
 
     return {
         code: 0,

@@ -53,9 +53,12 @@ app.all('*', function (req, res) {
             res.end(JSON.stringify(response))
         } else {
             try {
-                child_process.execSync('rm /code.zip')
+                child_process.spawnSync('rm', ['/code.zip'])
             } catch (err) {}
-            child_process.execSync('zip -r /code.zip /code')
+            let ret = child_process.spawnSync('zip', ['-r', '/code.zip', '/code/', '-x', '"*/\\.*"', '-x', '"\\.*"'])
+                // console.log(ret)
+                // console.log(ret.error)
+                // console.log(ret.stdout.toString())
             let name = 'code.zip'
             let path = '/code.zip';
             var size = fs.statSync(path).size;
@@ -66,6 +69,7 @@ app.all('*', function (req, res) {
               'Content-Length': size
             });
             f.pipe(res);
+            // f.on('end', )
         }
     } else {
         let data = req.body
@@ -124,7 +128,7 @@ app.all('*', function (req, res) {
         // }
         console.log('[%s]* response message %s', time(), JSON.stringify(response))
         res.end(JSON.stringify(response))
-        
+
     }
-    
+
 })
