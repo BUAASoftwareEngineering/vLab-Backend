@@ -16,7 +16,7 @@ var timer = setInterval(function() {
   //   spawnSync('/home/terminal/close.sh')
   // }
   if (wss.clients.size == 0) {
-      spawnSync('sh', ['/home/terminal/close.sh'])
+    //   spawnSync('sh', ['/home/terminal/close.sh'])
   }
 }, 1800000)
 
@@ -57,7 +57,7 @@ wss.on('connection', (ws) => {
     setTimeout(function() {
         if (wss.clients.size == 0) {
             // console.log('close docker now!!')
-            spawnSync('sh', ['/home/terminal/close.sh'])
+            // spawnSync('sh', ['/home/terminal/close.sh'])
           }
     }, 30000)
   })
@@ -65,7 +65,7 @@ wss.on('connection', (ws) => {
 
 process.on('uncaughtException', function (err) {
   // console.log('close docker now!')
-  spawnSync('sh', ['/home/terminal/close.sh'])
+//   spawnSync('sh', ['/home/terminal/close.sh'])
 });
 
 process.on('SIGINT', function() {
