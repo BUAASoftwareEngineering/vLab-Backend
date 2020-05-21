@@ -1,4 +1,5 @@
 const fs = require('fs')
+const child_process = require('child_process')
 const TextDecoder = require('util').TextDecoder
 const TextEncoder = require('util').TextEncoder
 const spawnSync = require('child_process').spawnSync
@@ -260,6 +261,80 @@ function file_rename(data) {
     }
 }
 
+function file_download(obj, res) {
+    
+    console.log(obj.query)
+    // console.log(data)
+    if ((obj.path == undefined) || (obj.path == '')) {
+        try {
+            child_process.spawnSync('rm', ['/code.zip'])
+        } catch (err) {}
+        let ret = child_process.spawnSync('zip', ['-r', '/code.zip', '/code/', '-x', '"*/\\.*"', '-x', '"\\.*"'])
+            // console.log(ret)
+            // console.log(ret.error)
+            // console.log(ret.stdout.toString())
+        let name = 'code.zip'
+        let path = '/code.zip';
+        var size = fs.statSync(path).size;
+        var f = fs.createReadStream(path);
+        res.writeHead(200, {
+          'Content-Type': 'application/force-download',
+          'Content-Disposition': 'attachment; filename=' + name,
+          'Content-Length': size
+        });
+        f.pipe(res);
+    } else {
+        let path = obj.path
+        if (fs.existsSync(path)) {
+            if (fs.statSync(path).isDirectory()) {
+                try {
+                    child_process.spawnSync('rm', ['/code.zip'])
+                } catch (err) {}
+                let ret = child_process.spawnSync('zip', ['-r', '/code.zip', path, '-x', '"*/\\.*"', '-x', '"\\.*"'])
+                    // console.log(ret)
+                    // console.log(ret.error)
+                    // console.log(ret.stdout.toString())
+                let name = 'code.zip'
+                let zippath = '/code.zip';
+                var size = fs.statSync(zippath).size;
+                var f = fs.createReadStream(zippath);
+                res.writeHead(200, {
+                  'Content-Type': 'application/force-download',
+                  'Content-Disposition': 'attachment; filename=' + name,
+                  'Content-Length': size
+                });
+                f.pipe(res);
+            } else {
+                var size = fs.statSync(path).size
+                var f = fs.createReadStream(path)
+                let name = ''
+                for (let i = path.length - 1; i >= 0; i = i - 1) {
+                    if (path[i] != '/') {
+                        name = path[i] + name
+                    } else {
+                        break
+                    }
+                }
+                res.writeHead(200, {
+                  'Content-Type': 'application/force-download',
+                  'Content-Disposition': 'attachment; filename=' + name,
+                  'Content-Length': size
+                })
+                f.pipe(res)
+            }
+        } else {
+            res.end(JSON.stringify({
+                code: 500,
+                message: "file path not exists!",
+                data: {}
+            }))
+        }
+    }
+    
+    // f.on('end', )
+    
+}
+
 function dir_new(data) {
     let obj = data
     let dir_path = obj.dir_path
@@ -466,6 +541,7 @@ module.exports = {
     file_move,
     file_copy,
     file_rename,
+    file_download,
     dir_new,
     dir_delete,
     dir_copy,

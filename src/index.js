@@ -33,6 +33,7 @@ app.all('*', function (req, res) {
                     response = handler.file_content(data)
                     break;
                 case '/file/download':
+                    handler.file_download(req.query, res)
                     break;
                 default:
                     response = {
@@ -51,25 +52,6 @@ app.all('*', function (req, res) {
         if (url != '/file/download') {
             console.log('[%s]* response message %s', time(), JSON.stringify(response))
             res.end(JSON.stringify(response))
-        } else {
-            try {
-                child_process.spawnSync('rm', ['/code.zip'])
-            } catch (err) {}
-            let ret = child_process.spawnSync('zip', ['-r', '/code.zip', '/code/', '-x', '"*/\\.*"', '-x', '"\\.*"'])
-                // console.log(ret)
-                // console.log(ret.error)
-                // console.log(ret.stdout.toString())
-            let name = 'code.zip'
-            let path = '/code.zip';
-            var size = fs.statSync(path).size;
-            var f = fs.createReadStream(path);
-            res.writeHead(200, {
-              'Content-Type': 'application/force-download',
-              'Content-Disposition': 'attachment; filename=' + name,
-              'Content-Length': size
-            });
-            f.pipe(res);
-            // f.on('end', )
         }
     } else {
         let data = req.body
