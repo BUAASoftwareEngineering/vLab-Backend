@@ -56,10 +56,12 @@ public class FileController {
 
     @GetMapping("/download")
     public String downLoadCode(@RequestParam(PARAM_PROJECT_ID) Integer projectId,
+                               @RequestParam("path") String path,
                                HttpServletResponse res) throws IOException, URISyntaxException {
         Project project = projectService.getProjectById(projectId);
 
         Map<String, String> params = new HashMap<>();
+        params.put("path", path);
         HttpResponse received = new HttpSender(project.getIp(), project.getServerPort(), "/file/download", params).getForResponse();
 
         buildResHeads(received, res);
