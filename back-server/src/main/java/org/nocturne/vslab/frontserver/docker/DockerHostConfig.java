@@ -1,4 +1,4 @@
-package org.nocturne.vslab.backserver.docker;
+package org.nocturne.vslab.frontserver.docker;
 
 import java.util.ArrayList;
 import java.util.List;

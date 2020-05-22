@@ -1,11 +1,8 @@
 package org.nocturne.vslab.backserver;
 
-import com.github.dockerjava.api.DockerClient;
 import org.junit.jupiter.api.Test;
 import org.nocturne.vslab.api.entity.ImageType;
-import org.nocturne.vslab.backserver.docker.DockerClientFactory;
-import org.nocturne.vslab.backserver.docker.DockerHostConfig;
-import org.nocturne.vslab.backserver.manager.DockerManagerImpl;
+import org.nocturne.vslab.frontserver.manager.DockerManagerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 

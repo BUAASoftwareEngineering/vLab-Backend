@@ -1,4 +1,4 @@
-package org.nocturne.vslab.backserver.manager;
+package org.nocturne.vslab.frontserver.manager;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
@@ -10,8 +10,8 @@ import org.apache.dubbo.config.annotation.Service;
 import org.nocturne.vslab.api.entity.Container;
 import org.nocturne.vslab.api.entity.ImageType;
 import org.nocturne.vslab.api.manager.DockerManager;
-import org.nocturne.vslab.backserver.docker.DockerClientFactory;
-import org.nocturne.vslab.backserver.docker.DockerHostConfig;
+import org.nocturne.vslab.frontserver.docker.DockerClientFactory;
+import org.nocturne.vslab.frontserver.docker.DockerHostConfig;
 import org.nocturne.vslab.backserver.mapper.ContainerMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

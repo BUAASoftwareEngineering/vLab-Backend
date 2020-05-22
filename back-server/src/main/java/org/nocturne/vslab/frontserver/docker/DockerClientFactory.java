@@ -1,9 +1,8 @@
-package org.nocturne.vslab.backserver.docker;
+package org.nocturne.vslab.frontserver.docker;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.core.DefaultDockerClientConfig;
 import com.github.dockerjava.core.DockerClientBuilder;
-import com.github.dockerjava.core.DockerClientConfig;
 import org.springframework.stereotype.Component;
 
 @Component
