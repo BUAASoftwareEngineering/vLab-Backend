@@ -8,6 +8,7 @@ import org.nocturne.vslab.backend.util.EmailCaptchaPool;
 import org.nocturne.vslab.backend.util.UserTokenPool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.Cookie;
@@ -86,6 +87,21 @@ public class UserController {
     public Result info(@CookieValue(PARAM_USER_ID) Integer userId) {
         User user = userService.getUserById(userId);
         return new Result(0, "查询成功", user);
+    }
+
+    @PostMapping("/reset")
+    public Result reset(@RequestParam(PARAM_USER_EMAIL) String email,
+                        @RequestParam("captcha") String captcha,
+                        @RequestParam(PARAM_USER_PASSWORD) String password) {
+        if (!captchaPool.isCaptchaAccepted(email, captcha)) {
+            throw new WrongCaptchaException();
+        }
+
+        User user = userService.getUserByEmail(email);
+        user.setPassword(DigestUtils.md5DigestAsHex(password.getBytes()));
+        userService.updateUser(user);
+
+        return new Result(0, "更新成功", user);
     }
 
     private void removeCookie(HttpServletResponse response, String cookieName) {

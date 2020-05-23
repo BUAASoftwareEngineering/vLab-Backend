@@ -37,6 +37,14 @@ public class UserService {
         }
     }
 
+    public User getUserByEmail(String email) {
+        try {
+            return Objects.requireNonNull(userMapper.getUserByEmail(email));
+        } catch (Exception e) {
+            throw new UserNotFoundException();
+        }
+    }
+
     public void createUser(User user) {
         try {
             userMapper.createUser(user);

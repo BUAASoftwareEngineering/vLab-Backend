@@ -27,6 +27,12 @@ public class EmailCaptchaPool {
 
     public boolean isCaptchaAccepted(String email, String captcha) {
         String expectedToken = redisTemplate.opsForValue().get("captcha:" + email);
-        return expectedToken != null && expectedToken.equals(captcha);
+
+        boolean success = expectedToken != null && expectedToken.equals(captcha);
+        if (success) {
+            redisTemplate.delete("captcha:" + email);
+        }
+
+        return success;
     }
 }

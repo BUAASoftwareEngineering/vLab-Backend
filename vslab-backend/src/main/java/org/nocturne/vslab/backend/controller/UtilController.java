@@ -57,11 +57,8 @@ public class UtilController {
         message.setFrom("vlab_team@yeah.net");
         message.setTo(email);
         message.setCc("vlab_team@yeah.net");
-        message.setSubject("vlab很高兴和您相遇");
-        message.setText("终于等到你，还好我没放弃~\n" +
-                "听说你也在找我，其实我也在等你哦！\n" +
-                "很快我们就能见面啦，这是我们之间的见面暗号：" + captcha + "\n" +
-                "嘘~不要告诉别人哦，快快去完成后面的步骤吧!");
+        message.setSubject("vlab为您竭诚服务");
+        message.setText("很快我们就能见面啦，这是我们之间的见面暗号：" + captcha);
 
         mailSender.send(message);
 
