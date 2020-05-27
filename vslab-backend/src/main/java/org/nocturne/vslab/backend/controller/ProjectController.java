@@ -42,7 +42,7 @@ public class ProjectController {
                                 @RequestParam(PARAM_PROJECT_NAME) String projectName,
                                 @RequestParam(PARAM_PROJECT_TYPE) String projectType) {
         ImageType imageType = ImageType.valueOf(projectType);
-        checkAmountOfContainer(userId, imageType);
+        //checkAmountOfContainer(userId, imageType);
 
         Project project = dockerManager.createContainer(userId, projectName, imageType);
         return new Result(0, "创建成功", project);

@@ -161,7 +161,6 @@ public class DockerManagerImpl implements DockerManager {
 
     /**
      * 1. remove bind record of the container in db
-     * 2. remove remote file on cloud
      */
     @Transactional
     @Override

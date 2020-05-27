@@ -4,7 +4,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.nocturne.vslab.backend.bean.Project;
-import org.nocturne.vslab.backend.mapper.ProjectMapper;
 import org.nocturne.vslab.backend.service.ProjectService;
 import org.nocturne.vslab.backend.util.HttpSender;
 import org.springframework.beans.factory.annotation.Autowired;

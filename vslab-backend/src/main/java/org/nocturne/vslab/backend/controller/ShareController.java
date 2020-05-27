@@ -46,6 +46,12 @@ public class ShareController {
                 .map(projectService::getProjectById)
                 .collect(Collectors.toList());
 
+        projectList.forEach(p -> {
+            String writableStr = redisTemplate.opsForValue().get(getShareKey(username, p.getProjectId()));
+            Boolean writable = Boolean.valueOf(writableStr);
+            p.setWriteable(writable);
+        });
+
         return new Result(0, "查询成功", projectList);
     }
 
