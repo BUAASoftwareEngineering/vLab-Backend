@@ -91,9 +91,9 @@ public class DockerManagerImpl implements DockerManager {
         // create and run container on randomly chosen host
         String ip = DockerHostConfig.getIPRandomly();
 
-        DockerClient dockerClient = DockerClientFactory.getDockerClient(ip);
         String containerId = createNewContainer(projectId, ip, project.getImageType());
 
+        DockerClient dockerClient = DockerClientFactory.getDockerClient(ip);
         dockerClient.startContainerCmd(containerId).exec();
 
         // update container info to db
@@ -120,6 +120,7 @@ public class DockerManagerImpl implements DockerManager {
                 .withPortBindings(portBindings)
                 .withPublishAllPorts(false)
                 .withMemory(300 * 1024 * 1024L)
+                .withPrivileged(true)
                 .withBinds(new Bind("/ProjectFiles/" + projectId, new Volume("/code")));
 
         DockerClient dockerClient = DockerClientFactory.getDockerClient(ip);
